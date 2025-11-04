@@ -13,6 +13,7 @@ from Visual.pitch_visualizations import PitchVisualizations
 from Visual.statistical_visualizations import StatisticalVisualizations
 from Visual.heatmap_visualizations import HeatmapVisualizations
 from Visual.advanced_visualizations import AdvancedVisualizations
+from Visual.tactical_visualizations import TacticalVisualizer
 
 
 class ReportGenerator:
@@ -33,6 +34,7 @@ class ReportGenerator:
         self.stats_viz = StatisticalVisualizations()
         self.heatmap_viz = HeatmapVisualizations()
         self.advanced_viz = AdvancedVisualizations()
+        self.tactical_viz = TacticalVisualizer()
 
     def generate_report(self, whoscored_id: int, fotmob_id: Optional[int] = None,
                        output_file: Optional[str] = None, use_cache: bool = True,
@@ -92,6 +94,12 @@ class ReportGenerator:
         home_positions, home_connections = processor.get_pass_network_data(home_id, min_passes=3)
         away_positions, away_connections = processor.get_pass_network_data(away_id, min_passes=3)
 
+        # Zonal control data
+        zone_matrix = None
+        if processor.event_processor:
+            zone_matrix = processor.event_processor.calculate_zonal_control(home_id, away_id,
+                                                                           grid_cols=6, grid_rows=4)
+
         # Create figure
         print("3. Creating visualizations...")
         fig = plt.figure(figsize=figsize, facecolor='#f0f0f0')
@@ -141,8 +149,24 @@ class ReportGenerator:
                                                           home_color, home_name)
 
         ax11 = fig.add_subplot(gs[3, 1])
-        self.heatmap_viz.create_touch_heatmap(ax11, events_df[events_df['teamId']==home_id],
-                                              home_color, home_name)
+        if zone_matrix is not None:
+            # Create zonal control map
+            home_team_info = {
+                'name': home_name,
+                'id': home_id
+            }
+            away_team_info = {
+                'name': away_name,
+                'id': away_id
+            }
+            self.tactical_viz.create_zonal_control_map(ax11, zone_matrix,
+                                                      home_team_info, away_team_info,
+                                                      home_color, away_color,
+                                                      'right', 'left')
+        else:
+            # Fallback to touch heatmap if no data
+            self.heatmap_viz.create_touch_heatmap(ax11, events_df[events_df['teamId']==home_id],
+                                                  home_color, home_name)
 
         ax12 = fig.add_subplot(gs[3, 2])
         self.heatmap_viz.create_defensive_actions_heatmap(ax12, def_actions_away,

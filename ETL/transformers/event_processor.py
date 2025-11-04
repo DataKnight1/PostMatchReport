@@ -325,3 +325,66 @@ class EventProcessor:
         # This will be implemented with player data
         # For now, return empty DataFrames
         return pd.DataFrame(), pd.DataFrame()
+
+    def calculate_zonal_control(self, home_id: int, away_id: int,
+                               grid_cols: int = 6, grid_rows: int = 4) -> np.ndarray:
+        """
+        Calculate which team controls each zone based on touch count.
+
+        Args:
+            home_id: Home team ID
+            away_id: Away team ID
+            grid_cols: Number of grid columns (default 6)
+            grid_rows: Number of grid rows (default 4)
+
+        Returns:
+            2D numpy array with zone control ('H', 'A', or 'C' for contested)
+        """
+        if self.events_df is None or self.events_df.empty:
+            # Return neutral zones if no data
+            return np.full((grid_rows, grid_cols), 'C', dtype=object)
+
+        # Pitch dimensions (105m x 68m)
+        pitch_length = 105.0
+        pitch_width = 68.0
+
+        # Zone dimensions
+        zone_length = pitch_length / grid_cols
+        zone_width = pitch_width / grid_rows
+
+        # Initialize zone matrix
+        zone_matrix = np.full((grid_rows, grid_cols), 'C', dtype=object)
+
+        # Count touches per zone for each team
+        for row in range(grid_rows):
+            for col in range(grid_cols):
+                # Calculate zone boundaries
+                x_min = col * zone_length
+                x_max = (col + 1) * zone_length
+                y_min = row * zone_width
+                y_max = (row + 1) * zone_width
+
+                # Get events in this zone
+                zone_events = self.events_df[
+                    (self.events_df['x'] >= x_min) &
+                    (self.events_df['x'] < x_max) &
+                    (self.events_df['y'] >= y_min) &
+                    (self.events_df['y'] < y_max)
+                ]
+
+                # Count touches for each team
+                home_touches = len(zone_events[zone_events['teamId'] == home_id])
+                away_touches = len(zone_events[zone_events['teamId'] == away_id])
+
+                # Determine control (10% threshold for contested)
+                total_touches = home_touches + away_touches
+                if total_touches == 0:
+                    zone_matrix[row, col] = 'C'
+                elif home_touches > away_touches * 1.1:
+                    zone_matrix[row, col] = 'H'
+                elif away_touches > home_touches * 1.1:
+                    zone_matrix[row, col] = 'A'
+                else:
+                    zone_matrix[row, col] = 'C'
+
+        return zone_matrix
