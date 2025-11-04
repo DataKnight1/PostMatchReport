@@ -173,6 +173,21 @@ class MatchProcessor:
             return self.player_processor.get_pass_connections(team_id, min_passes)
         return pd.DataFrame()
 
+    def get_pass_network_data(self, team_id: int, min_passes: int = 3) -> tuple:
+        """
+        Get complete pass network data.
+
+        Args:
+            team_id: Team ID
+            min_passes: Minimum passes to show
+
+        Returns:
+            Tuple of (positions_df, connections_df)
+        """
+        if self.player_processor:
+            return self.player_processor.get_pass_network_data(team_id, min_passes)
+        return pd.DataFrame(), pd.DataFrame()
+
     def export_summary_to_dict(self) -> Dict[str, Any]:
         """Export complete summary as dictionary for reporting."""
         summary = self.get_complete_match_summary()

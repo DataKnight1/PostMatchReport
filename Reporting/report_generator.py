@@ -88,11 +88,9 @@ class ReportGenerator:
         def_actions_home = processor.get_defensive_actions(home_id)
         def_actions_away = processor.get_defensive_actions(away_id)
         
-        # Player positions and connections
-        home_positions = processor.get_player_positions(home_id, starting_xi_only=True)
-        away_positions = processor.get_player_positions(away_id, starting_xi_only=True)
-        home_connections = processor.get_pass_connections(home_id, min_passes=3)
-        away_connections = processor.get_pass_connections(away_id, min_passes=3)
+        # Pass network data (using enhanced method)
+        home_positions, home_connections = processor.get_pass_network_data(home_id, min_passes=3)
+        away_positions, away_connections = processor.get_pass_network_data(away_id, min_passes=3)
 
         # Create figure
         print("3. Creating visualizations...")

@@ -217,13 +217,13 @@ class PlayerProcessor:
 
         starting_ids = starting['player_id'].tolist()
 
-        # Identify receivers
+        # Identify receivers - the next player from same team who touches the ball
         passes['receiver'] = None
         for idx in passes.index:
             pass_row = passes.loc[idx]
             next_events = self.events_df[
                 (self.events_df.index > idx) &
-                (self.events_df['teamId'] == team_row['teamId']) &
+                (self.events_df['teamId'] == team_id) &
                 (self.events_df['playerId'] != pass_row['playerId'])
             ]
             if len(next_events) > 0:
@@ -238,10 +238,107 @@ class PlayerProcessor:
         # Remove passes without receiver
         passes = passes[passes['receiver'].notna()]
 
-        # Aggregate
-        connections = passes.groupby(['playerId', 'receiver']).size().reset_index(name='pass_count')
+        # Calculate pass counts both ways (pos_min, pos_max approach)
+        passes_copy = passes[['playerId', 'receiver']].copy()
+        passes_copy['pos_min'] = passes_copy[['playerId', 'receiver']].min(axis=1)
+        passes_copy['pos_max'] = passes_copy[['playerId', 'receiver']].max(axis=1)
+
+        # Aggregate passes between each pair
+        connections = passes_copy.groupby(['pos_min', 'pos_max']).size().reset_index(name='pass_count')
 
         # Filter by minimum passes
         connections = connections[connections['pass_count'] >= min_passes]
 
         return connections
+
+    def get_pass_network_data(self, team_id: int, min_passes: int = 3) -> tuple:
+        """
+        Get complete pass network data including positions and connections.
+
+        Args:
+            team_id: Team ID
+            min_passes: Minimum passes to show connection
+
+        Returns:
+            Tuple of (average_positions_df, pass_connections_df)
+        """
+        if self.events_df is None or self.events_df.empty:
+            return pd.DataFrame(), pd.DataFrame()
+
+        # Get successful passes for team
+        passes = self.events_df[
+            (self.events_df['teamId'] == team_id) &
+            (self.events_df['type_display'] == 'Pass') &
+            (self.events_df['is_successful'] == True)
+        ].copy()
+
+        # Get starting XI
+        starting = self.get_starting_xi(team_id)
+        if starting.empty:
+            return pd.DataFrame(), pd.DataFrame()
+
+        starting_ids = starting['player_id'].tolist()
+
+        # Filter for starting XI
+        passes = passes[passes['playerId'].isin(starting_ids)]
+
+        # Calculate average positions from pass locations
+        avg_positions = passes.groupby('playerId').agg({
+            'x': 'mean',
+            'y': 'mean',
+            'eventId': 'count'
+        }).reset_index()
+        avg_positions.columns = ['playerId', 'x', 'y', 'count']
+
+        # Merge with player info
+        avg_positions = avg_positions.merge(
+            starting[['player_id', 'name', 'shirt_no', 'position']],
+            left_on='playerId',
+            right_on='player_id',
+            how='left'
+        )
+
+        # Identify receivers
+        passes['receiver'] = None
+        for idx in passes.index:
+            pass_row = passes.loc[idx]
+            next_events = self.events_df[
+                (self.events_df.index > idx) &
+                (self.events_df['teamId'] == team_id) &
+                (self.events_df['playerId'] != pass_row['playerId'])
+            ]
+            if len(next_events) > 0:
+                passes.at[idx, 'receiver'] = next_events.iloc[0]['playerId']
+
+        # Filter for starting XI receivers
+        passes = passes[passes['receiver'].isin(starting_ids)]
+        passes = passes[passes['receiver'].notna()]
+
+        # Calculate pass counts using pos_min/pos_max
+        passes_copy = passes[['playerId', 'receiver']].copy()
+        passes_copy['pos_min'] = passes_copy[['playerId', 'receiver']].min(axis=1)
+        passes_copy['pos_max'] = passes_copy[['playerId', 'receiver']].max(axis=1)
+
+        # Aggregate
+        connections = passes_copy.groupby(['pos_min', 'pos_max']).size().reset_index(name='pass_count')
+
+        # Add position data for both players
+        connections = connections.merge(
+            avg_positions[['playerId', 'x', 'y']],
+            left_on='pos_min',
+            right_on='playerId',
+            how='left'
+        ).drop('playerId', axis=1)
+
+        connections = connections.merge(
+            avg_positions[['playerId', 'x', 'y']],
+            left_on='pos_max',
+            right_on='playerId',
+            how='left',
+            suffixes=['', '_end']
+        ).drop('playerId', axis=1)
+
+        # Filter by minimum passes
+        connections = connections[connections['pass_count'] >= min_passes]
+
+        return avg_positions, connections
