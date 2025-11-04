@@ -11,9 +11,8 @@ from datetime import datetime
 import json
 import os
 
-from generate_report import MatchReportGenerator
-from match_data_processor import MatchDataProcessor
-from match_visualizations import create_full_match_report
+from Reporting.report_generator import ReportGenerator
+from ETL.transformers.match_processor import MatchProcessor
 
 
 # Page configuration
@@ -67,23 +66,30 @@ def generate_report_cached(whoscored_id: int, fotmob_id: int = None):
         fotmob_id: FotMob match ID
 
     Returns:
-        Matplotlib Figure
+        Matplotlib Figure and match summary
     """
-    generator = MatchReportGenerator(cache_dir="./cache")
+    # Use new ReportGenerator
+    generator = ReportGenerator(cache_dir="./cache")
 
-    # Extract data
-    whoscored_data, fotmob_data = generator.extract_all_data(
+    # Generate complete report
+    fig = generator.generate_report(
+        whoscored_id=whoscored_id,
+        fotmob_id=fotmob_id,
+        output_file=None,
+        use_cache=True,
+        dpi=100
+    )
+
+    # Load data for summary info
+    whoscored_data, fotmob_data = generator.data_loader.load_all_data(
         whoscored_id, fotmob_id, use_cache=True
     )
 
-    # Process data
-    processor = MatchDataProcessor(whoscored_data, fotmob_data)
-    team_info = processor.get_team_info()
+    # Process data for summary
+    processor = MatchProcessor(whoscored_data, fotmob_data)
+    match_summary = processor.get_complete_match_summary()
 
-    # Create report
-    fig = create_full_match_report(processor, team_info, figsize=(20, 22))
-
-    return fig, team_info
+    return fig, match_summary
 
 
 def fig_to_base64(fig, dpi=100):
@@ -232,13 +238,22 @@ def main():
                 # Generate report
                 fotmob_id_value = fotmob_id if fotmob_id > 0 else None
 
-                fig, team_info = generate_report_cached(whoscored_id, fotmob_id_value)
+                fig, match_summary = generate_report_cached(whoscored_id, fotmob_id_value)
+
+                # Extract data from match_summary
+                home_name = match_summary['teams']['home']['name']
+                away_name = match_summary['teams']['away']['name']
+                score = match_summary['match_info'].get('score', '0:0')
+                home_score, away_score = score.split(':') if ':' in score else ('0', '0')
+                league = match_summary['match_info'].get('competition', {}).get('name', 'N/A')
+                date = match_summary['match_info'].get('date', 'N/A')[:10]
+                venue = match_summary['match_info'].get('venue', 'N/A')
 
                 # Display match info
                 st.markdown(f"""
                 <div class="match-info">
-                <h2>⚽ {team_info['home']['name']} {team_info['home']['score']} - {team_info['away']['score']} {team_info['away']['name']}</h2>
-                <p><strong>League:</strong> {team_info.get('league', 'N/A')} | <strong>Date:</strong> {team_info.get('date', 'N/A')[:10]}</p>
+                <h2>⚽ {home_name} {home_score} - {away_score} {away_name}</h2>
+                <p><strong>League:</strong> {league} | <strong>Date:</strong> {date}</p>
                 </div>
                 """, unsafe_allow_html=True)
 
@@ -246,27 +261,34 @@ def main():
                 col1, col2, col3, col4 = st.columns(4)
 
                 with col1:
+                    home_poss = match_summary['possession'].get('home', 50)
+                    away_poss = match_summary['possession'].get('away', 50)
                     st.metric(
                         "Possession",
-                        f"{team_info['possession']['home_possession']:.0f}% - {team_info['possession']['away_possession']:.0f}%"
+                        f"{home_poss:.0f}% - {away_poss:.0f}%"
                     )
 
                 with col2:
+                    home_xg = match_summary['xg'].get('home_xg', 0)
+                    away_xg = match_summary['xg'].get('away_xg', 0)
                     st.metric(
                         "xG",
-                        f"{team_info['xg']['home_xg']:.2f} - {team_info['xg']['away_xg']:.2f}"
+                        f"{home_xg:.2f} - {away_xg:.2f}"
                     )
 
                 with col3:
+                    shots_data = match_summary.get('shots_data', {})
+                    home_shots = shots_data.get('home_shots', 0)
+                    away_shots = shots_data.get('away_shots', 0)
                     st.metric(
                         "Shots",
-                        f"{team_info['shots']['home_shots']} - {team_info['shots']['away_shots']}"
+                        f"{home_shots} - {away_shots}"
                     )
 
                 with col4:
                     st.metric(
                         "Venue",
-                        team_info.get('venue', 'N/A')
+                        venue
                     )
 
                 st.markdown("---")
@@ -291,7 +313,7 @@ def main():
                 fig.savefig(buf, format='png', dpi=dpi_setting, bbox_inches='tight', facecolor='#f0f0f0')
                 buf.seek(0)
 
-                filename = f"{team_info['home']['name']}_{team_info['away']['name']}_{datetime.now().strftime('%Y%m%d')}_MatchReport.png"
+                filename = f"{home_name}_{away_name}_{datetime.now().strftime('%Y%m%d')}_MatchReport.png"
                 filename = filename.replace(' ', '_')
 
                 st.download_button(
