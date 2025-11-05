@@ -212,7 +212,9 @@ class EventProcessor:
         if self.events_df is None or self.events_df.empty:
             return pd.DataFrame()
 
-        shots = self.events_df[self.events_df['type_display'] == 'Shot'].copy()
+        # Include all shot-related events
+        shot_types = ['Shot', 'MissedShots', 'SavedShot', 'ShotOnPost', 'Goal']
+        shots = self.events_df[self.events_df['type_display'].isin(shot_types)].copy()
 
         if team_id is not None:
             shots = shots[shots['teamId'] == team_id]

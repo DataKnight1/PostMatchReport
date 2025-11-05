@@ -5,8 +5,14 @@ Extracts comprehensive match data from all WhoScored sections with detailed pars
 
 import re
 import json
+import sys
+import asyncio
 from typing import Dict, Any, Optional, List
 from playwright.sync_api import sync_playwright, TimeoutError as PlaywrightTimeoutError
+
+# Fix for Windows asyncio subprocess issue
+if sys.platform == 'win32':
+    asyncio.set_event_loop_policy(asyncio.WindowsProactorEventLoopPolicy())
 
 
 class WhoScoredExtractor:
@@ -57,6 +63,25 @@ class WhoScoredExtractor:
                 else:
                     page.goto(url, wait_until="domcontentloaded", timeout=60000)
 
+                # Additional wait for JavaScript to execute
+                page.wait_for_timeout(3000)
+
+                # Try to extract data directly from JavaScript
+                try:
+                    data = page.evaluate("""
+                        () => {
+                            if (typeof require !== 'undefined' && require.config && require.config.params) {
+                                return require.config.params["args"];
+                            }
+                            return null;
+                        }
+                    """)
+                    if data:
+                        # Return a special marker with the data
+                        return json.dumps({'__playwright_data__': data})
+                except Exception as e:
+                    print(f"DEBUG: Could not extract data via JavaScript: {e}")
+
                 html = page.content()
                 return html
             finally:
@@ -72,17 +97,35 @@ class WhoScoredExtractor:
         Returns:
             Parsed JSON data or None if not found
         """
+        # Check if this is data extracted via Playwright JavaScript
+        try:
+            parsed = json.loads(html)
+            if '__playwright_data__' in parsed:
+                print("DEBUG: Using data extracted via Playwright JavaScript")
+                return parsed['__playwright_data__']
+        except:
+            pass
+
         match = re.search(self.JSON_REGEX, html)
         if not match:
+            print("DEBUG: JSON regex pattern did not match")
+            print(f"DEBUG: Checking if 'require.config.params' exists in HTML: {'require.config.params' in html}")
+            print(f"DEBUG: HTML length: {len(html)} characters")
             return None
 
         json_str = match.group(0).rstrip(';').strip()
 
+        # Fix JavaScript object notation to valid JSON
+        # Replace unquoted keys with quoted keys
+        json_str = re.sub(r'(\w+):', r'"\1":', json_str)
+
         try:
             data = json.loads(json_str)
+            print(f"DEBUG: Successfully parsed JSON with {len(data)} top-level keys")
             return data
         except json.JSONDecodeError as e:
             print(f"Error parsing JSON: {e}")
+            print(f"DEBUG: First 200 chars of JSON string: {json_str[:200]}")
             return None
 
     def extract_match_centre_detailed(self, match_id: int) -> Dict[str, Any]:
@@ -257,9 +300,13 @@ class WhoScoredExtractor:
         """Parse all player data including statistics."""
         home_players = data.get('home', {}).get('players', [])
         away_players = data.get('away', {}).get('players', [])
+        home_team_id = data.get('home', {}).get('teamId')
+        away_team_id = data.get('away', {}).get('teamId')
 
         all_players = []
-        for player in home_players + away_players:
+
+        # Parse home players
+        for player in home_players:
             parsed_player = {
                 'player_id': player.get('playerId'),
                 'name': player.get('name'),
@@ -270,7 +317,33 @@ class WhoScoredExtractor:
                 'weight': player.get('weight'),
                 'is_first_eleven': player.get('isFirstEleven'),
                 'is_captain': player.get('isCaptain'),
-                'team_id': player.get('teamId'),
+                'team_id': home_team_id,
+                'stats': player.get('stats', {}),
+                'ratings': {
+                    'overall': player.get('rating'),
+                    'detailed': player.get('ratings', {})
+                },
+                'substitute_info': {
+                    'is_man_of_match': player.get('isManOfTheMatch'),
+                    'subon_minute': player.get('subOnMin'),
+                    'suboff_minute': player.get('subOffMin')
+                }
+            }
+            all_players.append(parsed_player)
+
+        # Parse away players
+        for player in away_players:
+            parsed_player = {
+                'player_id': player.get('playerId'),
+                'name': player.get('name'),
+                'shirt_no': player.get('shirtNo'),
+                'position': player.get('position'),
+                'age': player.get('age'),
+                'height': player.get('height'),
+                'weight': player.get('weight'),
+                'is_first_eleven': player.get('isFirstEleven'),
+                'is_captain': player.get('isCaptain'),
+                'team_id': away_team_id,
                 'stats': player.get('stats', {}),
                 'ratings': {
                     'overall': player.get('rating'),

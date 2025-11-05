@@ -27,22 +27,40 @@ class StatisticalVisualizations:
         ax.text(0.5, 0.88, subtitle, ha='center', va='top', fontsize=10)
 
         # Stats
-        stats_y, line_height = 0.75, 0.08
-        
+        stats_y, line_height = 0.75, 0.07
+
+        # Get team stats
+        team_stats = match_info.get('team_stats', {})
+        home_stats = team_stats.get('home', {})
+        away_stats = team_stats.get('away', {})
+
+        # Get shots data (use FotMob if available, otherwise from event data)
+        shots_data = match_info.get('shots_data', {})
+        home_shots = shots_data.get('home_shots', 0) if shots_data else 0
+        away_shots = shots_data.get('away_shots', 0) if shots_data else 0
+
         stats = [
             ('Possession', f"{match_info.get('possession', {}).get('home', 50):.0f}%",
              f"{match_info.get('possession', {}).get('away', 50):.0f}%"),
             ('xG', f"{match_info.get('xg', {}).get('home_xg', 0):.2f}",
              f"{match_info.get('xg', {}).get('away_xg', 0):.2f}"),
+            ('Shots', f"{home_shots}",
+             f"{away_shots}"),
+            ('Pass Accuracy', f"{home_stats.get('passing', {}).get('pass_accuracy', 0):.0f}%",
+             f"{away_stats.get('passing', {}).get('pass_accuracy', 0):.0f}%"),
+            ('Key Passes', f"{home_stats.get('passing', {}).get('key_passes', 0)}",
+             f"{away_stats.get('passing', {}).get('key_passes', 0)}"),
+            ('Tackles', f"{home_stats.get('defensive', {}).get('tackles', 0)}",
+             f"{away_stats.get('defensive', {}).get('tackles', 0)}"),
         ]
 
         home_color = match_info.get('team_colors', {}).get('home_color', '#FF0000')
         away_color = match_info.get('team_colors', {}).get('away_color', '#0000FF')
 
         for stat_name, home_val, away_val in stats:
-            ax.text(0.5, stats_y, stat_name, ha='center', fontsize=11, fontweight='bold')
-            ax.text(0.25, stats_y, home_val, ha='center', fontsize=11, color=home_color, fontweight='bold')
-            ax.text(0.75, stats_y, away_val, ha='center', fontsize=11, color=away_color, fontweight='bold')
+            ax.text(0.5, stats_y, stat_name, ha='center', fontsize=10, fontweight='bold')
+            ax.text(0.25, stats_y, home_val, ha='center', fontsize=10, color=home_color, fontweight='bold')
+            ax.text(0.75, stats_y, away_val, ha='center', fontsize=10, color=away_color, fontweight='bold')
             stats_y -= line_height
 
     def create_stats_comparison_bars(self, ax, team_stats, stat_name, home_color, away_color):

@@ -19,30 +19,40 @@ class PitchVisualizations:
         self.line_color = line_color
 
     def create_shot_map(self, ax, shots_home, shots_away, home_color, away_color):
-        """Create shot map with xG visualization."""
+        """Create shot map with shot outcome visualization."""
         pitch = VerticalPitch(pitch_type='custom', pitch_length=105, pitch_width=68,
                              pitch_color=self.pitch_color, line_color=self.line_color, linewidth=1.5)
         pitch.draw(ax=ax)
 
-        # Plot home shots (bottom)
+        # Plot home shots (bottom) - swap x,y for VerticalPitch
         for _, shot in shots_home.iterrows():
-            marker = '*' if shot.get('is_goal') else ('o' if shot.get('is_successful') else 'x')
-            size = 400 if shot.get('is_goal') else 200 if shot.get('is_successful') else 150
-            edge = 'gold' if shot.get('is_goal') else home_color
-            alpha = 0.4 + (0.6 * shot.get('xg', 0))
-            
-            ax.scatter(shot['x'], shot['y'], s=size, c=home_color, marker=marker,
-                      alpha=alpha, edgecolors=edge, linewidths=2, zorder=3)
+            shot_type = shot.get('type_display', '')
+            is_goal = shot_type == 'Goal'
+            is_on_target = shot_type in ['SavedShot', 'Goal']
 
-        # Plot away shots (top, mirrored)
+            marker = '*' if is_goal else ('o' if is_on_target else 'x')
+            size = 500 if is_goal else 250 if is_on_target else 150
+            edge = 'gold' if is_goal else home_color
+            alpha = 1.0 if is_goal else 0.7 if is_on_target else 0.5
+
+            # VerticalPitch: x=width, y=length; Data: x=length, y=width -> swap
+            ax.scatter(shot['y'], shot['x'], s=size, c=home_color, marker=marker,
+                      alpha=alpha, edgecolors=edge, linewidths=2.5 if is_goal else 2, zorder=3)
+
+        # Plot away shots (top, mirrored along length axis)
         for _, shot in shots_away.iterrows():
-            marker = '*' if shot.get('is_goal') else ('o' if shot.get('is_successful') else 'x')
-            size = 400 if shot.get('is_goal') else 200 if shot.get('is_successful') else 150
-            edge = 'gold' if shot.get('is_goal') else away_color
-            alpha = 0.4 + (0.6 * shot.get('xg', 0))
-            
-            ax.scatter(105-shot['x'], 68-shot['y'], s=size, c=away_color, marker=marker,
-                      alpha=alpha, edgecolors=edge, linewidths=2, zorder=3)
+            shot_type = shot.get('type_display', '')
+            is_goal = shot_type == 'Goal'
+            is_on_target = shot_type in ['SavedShot', 'Goal']
+
+            marker = '*' if is_goal else ('o' if is_on_target else 'x')
+            size = 500 if is_goal else 250 if is_on_target else 150
+            edge = 'gold' if is_goal else away_color
+            alpha = 1.0 if is_goal else 0.7 if is_on_target else 0.5
+
+            # VerticalPitch: x=width, y=length; Mirror length (105-x)
+            ax.scatter(shot['y'], 105-shot['x'], s=size, c=away_color, marker=marker,
+                      alpha=alpha, edgecolors=edge, linewidths=2.5 if is_goal else 2, zorder=3)
 
         ax.set_title('Shot Map', fontsize=12, fontweight='bold', pad=10)
 
@@ -92,13 +102,13 @@ class PitchVisualizations:
                 transparency = (transparency * (1 - MIN_TRANSPARENCY)) + MIN_TRANSPARENCY
                 color[:, 3] = transparency
 
-                # Draw pass lines
-                for idx, row in pass_connections_df.iterrows():
+                # Draw pass lines - use enumerate to get sequential index
+                for i, (idx, row) in enumerate(pass_connections_df.iterrows()):
                     if pd.notna(row.get('x')) and pd.notna(row.get('y')) and \
                        pd.notna(row.get('x_end')) and pd.notna(row.get('y_end')):
-                        ax.plot([row['x'], row['x_end']], 
+                        ax.plot([row['x'], row['x_end']],
                                [row['y'], row['y_end']],
-                               color=color[idx],
+                               color=color[i],
                                linewidth=row['line_width'],
                                zorder=1,
                                solid_capstyle='round')

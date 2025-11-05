@@ -1,36 +1,83 @@
 """
 FotMob Data Extractor
-Extracts match data from FotMob API including xG, team colors, and statistics.
+Extracts match data from FotMob API using signature-based authentication.
 """
 
-import requests
+import json
 import hashlib
 import base64
-import json
+import requests
 from typing import Dict, Any, Optional
 from datetime import datetime
+from bs4 import BeautifulSoup
 
 
 class FotMobExtractor:
-    """Extract match data from FotMob API."""
+    """Extract match data from FotMob using signature-based authentication."""
 
     BASE_URL = "https://www.fotmob.com/api"
     MATCH_DETAILS_URL = f"{BASE_URL}/matchDetails"
 
     def __init__(self):
         """Initialize the FotMob extractor."""
-        self.session = requests.Session()
-        self.headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-            'Accept': 'application/json, text/plain, */*',
-            'Accept-Language': 'en-US,en;q=0.9',
-            'Origin': 'https://www.fotmob.com',
-            'Referer': 'https://www.fotmob.com/',
-        }
+        self.version_number = self._get_version_number()
+        self.xmas_pass = self._get_xmas_pass()
+
+    def _get_version_number(self) -> Optional[str]:
+        """Get the current FotMob version number from their homepage."""
+        try:
+            headers = {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
+            }
+            response = requests.get("https://www.fotmob.com/", headers=headers, timeout=10)
+            soup = BeautifulSoup(response.text, 'html.parser')
+            version_element = soup.find('span', class_=lambda cls: cls and 'VersionNumber' in cls)
+            if version_element:
+                version = version_element.text.strip()
+                print(f"FotMob version: {version}")
+                return version
+            return None
+        except Exception as e:
+            print(f"Error getting version number: {e}")
+            return None
+
+    def _get_xmas_pass(self) -> Optional[str]:
+        """Fetch the xmas pass from GitHub."""
+        try:
+            url = 'https://raw.githubusercontent.com/bariscanyeksin/streamlit_radar/refs/heads/main/xmas_pass.txt'
+            response = requests.get(url, timeout=10)
+            if response.status_code == 200:
+                return response.text
+            return None
+        except Exception as e:
+            print(f"Error getting xmas pass: {e}")
+            return None
+
+    def _create_xmas_header(self, url: str, password: str) -> str:
+        """Create the x-mas authentication header."""
+        try:
+            timestamp = int(datetime.now().timestamp() * 1000)
+            request_data = {
+                "url": url,
+                "code": timestamp,
+                "foo": self.version_number
+            }
+
+            json_string = f"{json.dumps(request_data, separators=(',', ':'))}{password.strip()}"
+            signature = hashlib.md5(json_string.encode('utf-8')).hexdigest().upper()
+            body = {
+                "body": request_data,
+                "signature": signature
+            }
+            encoded = base64.b64encode(json.dumps(body, separators=(',', ':')).encode('utf-8')).decode('utf-8')
+            return encoded
+        except Exception as e:
+            print(f"Error creating xmas header: {e}")
+            return ""
 
     def get_match_details(self, match_id: int) -> Dict[str, Any]:
         """
-        Get match details from FotMob.
+        Get match details from FotMob API.
 
         Args:
             match_id: FotMob match ID
@@ -38,22 +85,39 @@ class FotMobExtractor:
         Returns:
             Dictionary containing match details
         """
-        url = f"{self.MATCH_DETAILS_URL}?matchId={match_id}"
-        print(f"Fetching FotMob data from: {url}")
+        api_url = f"/api/matchDetails?matchId={match_id}"
+        full_url = f"https://www.fotmob.com{api_url}"
+        print(f"Fetching FotMob data from: {full_url}")
 
         try:
-            response = self.session.get(url, headers=self.headers, timeout=30)
+            if not self.version_number or not self.xmas_pass:
+                raise Exception("Missing version number or xmas pass")
+
+            xmas_value = self._create_xmas_header(api_url, self.xmas_pass)
+
+            headers = {
+                'accept': '*/*',
+                'accept-language': 'en-US,en;q=0.9',
+                'referer': 'https://www.fotmob.com/',
+                'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
+                'x-mas': xmas_value,
+            }
+
+            response = requests.get(full_url, headers=headers, timeout=30)
             response.raise_for_status()
 
             data = response.json()
+            print("FotMob data fetched successfully!")
 
             return {
                 'match_id': match_id,
                 'data': data,
                 'success': True
             }
-        except requests.exceptions.RequestException as e:
+
+        except Exception as e:
             print(f"Error fetching FotMob data: {e}")
+            print("FotMob data is optional - continuing without it...")
             return {
                 'match_id': match_id,
                 'error': str(e),
@@ -72,12 +136,20 @@ class FotMobExtractor:
         """
         try:
             general = match_data.get('data', {}).get('general', {})
-            home_team = general.get('homeTeam', {})
-            away_team = general.get('awayTeam', {})
+            team_colors = general.get('teamColors', {}).get('lightMode', {})
+
+            home_color = team_colors.get('home', 'FF0000')
+            away_color = team_colors.get('away', '0000FF')
+
+            # Add # if not present
+            if not home_color.startswith('#'):
+                home_color = f'#{home_color}'
+            if not away_color.startswith('#'):
+                away_color = f'#{away_color}'
 
             return {
-                'home_color': f"#{home_team.get('teamColors', {}).get('primary', 'FF0000')}",
-                'away_color': f"#{away_team.get('teamColors', {}).get('primary', '0000FF')}"
+                'home_color': home_color,
+                'away_color': away_color
             }
         except Exception as e:
             print(f"Error extracting team colors: {e}")
@@ -131,19 +203,26 @@ class FotMobExtractor:
         """
         try:
             data = match_data.get('data', {})
-            header = data.get('header', {})
+            content = data.get('content', {})
+            stats = content.get('stats', {})
+            periods = stats.get('Periods', {})
+            all_period = periods.get('All', {})
+            stats_array = all_period.get('stats', [])
 
-            teams = header.get('teams', [])
-            if len(teams) >= 2:
-                home_xg = teams[0].get('xg', 0.0)
-                away_xg = teams[1].get('xg', 0.0)
-            else:
-                home_xg = away_xg = 0.0
+            # Find the Top stats group
+            for stat_group in stats_array:
+                if stat_group.get('title') == 'Top stats':
+                    # Find expected_goals within Top stats
+                    for stat in stat_group.get('stats', []):
+                        if stat.get('key') == 'expected_goals':
+                            xg_values = stat.get('stats', ['0.0', '0.0'])
+                            return {
+                                'home_xg': float(xg_values[0]) if xg_values[0] else 0.0,
+                                'away_xg': float(xg_values[1]) if len(xg_values) > 1 and xg_values[1] else 0.0
+                            }
 
-            return {
-                'home_xg': float(home_xg) if home_xg else 0.0,
-                'away_xg': float(away_xg) if away_xg else 0.0
-            }
+            return {'home_xg': 0.0, 'away_xg': 0.0}
+
         except Exception as e:
             print(f"Error extracting xG data: {e}")
             return {
@@ -165,27 +244,23 @@ class FotMobExtractor:
             data = match_data.get('data', {})
             content = data.get('content', {})
             stats = content.get('stats', {})
+            periods = stats.get('Periods', {})
+            all_period = periods.get('All', {})
+            stats_array = all_period.get('stats', [])
 
-            possession_stats = None
-            for stat in stats.get('Periods', {}).get('All', {}).get('stats', []):
-                if stat.get('title') == 'Possession':
-                    possession_stats = stat
-                    break
+            # Find the Top stats group and get Ball possession
+            for stat_group in stats_array:
+                if stat_group.get('title') == 'Top stats':
+                    for stat in stat_group.get('stats', []):
+                        if stat.get('key') == 'BallPossesion':
+                            poss_values = stat.get('stats', [50, 50])
+                            return {
+                                'home_possession': float(poss_values[0]) if poss_values[0] else 50.0,
+                                'away_possession': float(poss_values[1]) if len(poss_values) > 1 and poss_values[1] else 50.0
+                            }
 
-            if possession_stats:
-                stats_list = possession_stats.get('stats', [])
-                if len(stats_list) >= 2:
-                    home_poss = float(stats_list[0].get('value', '50').replace('%', ''))
-                    away_poss = float(stats_list[1].get('value', '50').replace('%', ''))
-                else:
-                    home_poss = away_poss = 50.0
-            else:
-                home_poss = away_poss = 50.0
+            return {'home_possession': 50.0, 'away_possession': 50.0}
 
-            return {
-                'home_possession': home_poss,
-                'away_possession': away_poss
-            }
         except Exception as e:
             print(f"Error extracting possession data: {e}")
             return {
@@ -207,27 +282,23 @@ class FotMobExtractor:
             data = match_data.get('data', {})
             content = data.get('content', {})
             stats = content.get('stats', {})
+            periods = stats.get('Periods', {})
+            all_period = periods.get('All', {})
+            stats_array = all_period.get('stats', [])
 
-            shots_stats = None
-            for stat in stats.get('Periods', {}).get('All', {}).get('stats', []):
-                if stat.get('title') == 'Shots':
-                    shots_stats = stat
-                    break
+            # Find the Top stats group and get total shots
+            for stat_group in stats_array:
+                if stat_group.get('title') == 'Top stats':
+                    for stat in stat_group.get('stats', []):
+                        if stat.get('key') == 'total_shots':
+                            shot_values = stat.get('stats', [0, 0])
+                            return {
+                                'home_shots': int(shot_values[0]) if shot_values[0] else 0,
+                                'away_shots': int(shot_values[1]) if len(shot_values) > 1 and shot_values[1] else 0
+                            }
 
-            if shots_stats:
-                stats_list = shots_stats.get('stats', [])
-                if len(stats_list) >= 2:
-                    home_shots = int(stats_list[0].get('value', 0))
-                    away_shots = int(stats_list[1].get('value', 0))
-                else:
-                    home_shots = away_shots = 0
-            else:
-                home_shots = away_shots = 0
+            return {'home_shots': 0, 'away_shots': 0}
 
-            return {
-                'home_shots': home_shots,
-                'away_shots': away_shots
-            }
         except Exception as e:
             print(f"Error extracting shots data: {e}")
             return {

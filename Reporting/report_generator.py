@@ -4,6 +4,7 @@ Main module for generating complete match reports using ETL and Visual component
 """
 
 import matplotlib.pyplot as plt
+import pandas as pd
 from typing import Dict, Any, Optional, Tuple
 import os
 
@@ -123,7 +124,9 @@ class ReportGenerator:
                                            home_color, home_name)
 
         ax5 = fig.add_subplot(gs[1, 1])
-        self.advanced_viz.create_xg_timeline(ax5, events_df[events_df['type_display']=='Shot'],
+        # Combine shots from both teams for xG timeline
+        all_shots = pd.concat([shots_home, shots_away]) if not shots_home.empty and not shots_away.empty else (shots_home if not shots_home.empty else shots_away)
+        self.advanced_viz.create_xg_timeline(ax5, all_shots,
                                             home_id, away_id, home_color, away_color)
 
         ax6 = fig.add_subplot(gs[1, 2])

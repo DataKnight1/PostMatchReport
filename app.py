@@ -128,14 +128,14 @@ def main():
         whoscored_id = st.number_input(
             "WhoScored Match ID",
             min_value=1,
-            value=1716104,
-            help="Enter the WhoScored match ID from the URL"
+            value=1821302,
+            help="Enter the WhoScored match ID from the URL (Default: Liverpool vs Man Utd, Jan 5 2025)"
         )
 
         fotmob_id = st.number_input(
             "FotMob Match ID (Optional)",
             min_value=0,
-            value=0,
+            value=3900958,
             help="Enter the FotMob match ID for enhanced stats (xG, colors, etc.)"
         )
 
@@ -245,8 +245,9 @@ def main():
                 away_name = match_summary['teams']['away']['name']
                 score = match_summary['match_info'].get('score', '0:0')
                 home_score, away_score = score.split(':') if ':' in score else ('0', '0')
-                league = match_summary['match_info'].get('competition', {}).get('name', 'N/A')
-                date = match_summary['match_info'].get('date', 'N/A')[:10]
+                competition = match_summary['match_info'].get('competition') or {}
+                league = competition.get('name', 'N/A')
+                date = match_summary['match_info'].get('date', 'N/A')[:10] if match_summary['match_info'].get('date') else 'N/A'
                 venue = match_summary['match_info'].get('venue', 'N/A')
 
                 # Display match info
@@ -277,7 +278,7 @@ def main():
                     )
 
                 with col3:
-                    shots_data = match_summary.get('shots_data', {})
+                    shots_data = match_summary.get('shots_data') or {}
                     home_shots = shots_data.get('home_shots', 0)
                     away_shots = shots_data.get('away_shots', 0)
                     st.metric(

@@ -33,6 +33,11 @@ class MatchProcessor:
         self.player_processor = None
         self.team_processor = None
 
+        # Initialize attributes (always set these to avoid AttributeError)
+        self.match_info = {}
+        self.home_team_data = {}
+        self.away_team_data = {}
+
         if match_centre.get('success'):
             # Events
             events_data = match_centre.get('events', {})
