@@ -90,7 +90,10 @@ class AdvancedVisualizations:
         ax.set_xlabel('Match Time (minutes)')
         ax.set_ylabel('Net Momentum')
         ax.set_title('Match Momentum (net)')
-        ax.legend(loc='upper left', fontsize=8, framealpha=0.9)
+        # Make legend text visible on all backgrounds
+        legend_text_color = '#e6edf3' if getattr(self, 'line_color', '#0e1117') == '#d0d7de' else 'black'
+        legend = ax.legend(loc='upper left', fontsize=8, framealpha=0.9)
+        plt.setp(legend.get_texts(), color=legend_text_color)
         ax.grid(True, alpha=0.15, axis='x')
 
     def create_xg_timeline(self, ax, shots_df, home_id, away_id, home_color, away_color):
@@ -161,7 +164,10 @@ class AdvancedVisualizations:
             Line2D([0], [0], marker='x', color='w', markerfacecolor='gray', markersize=8,
                   label='Off Target')
         ]
-        ax.legend(handles=legend_elements, loc='upper right', fontsize=7, framealpha=0.9)
+        # Make legend text visible on all backgrounds
+        legend_text_color = '#e6edf3' if getattr(self, 'line_color', '#0e1117') == '#d0d7de' else 'black'
+        legend = ax.legend(handles=legend_elements, loc='upper right', fontsize=7, framealpha=0.9)
+        plt.setp(legend.get_texts(), color=legend_text_color)
 
     def create_zone14_map(self, ax, passes_df, team_color, team_name):
         """Create Zone 14 and half-spaces visualization."""
@@ -319,7 +325,10 @@ class AdvancedVisualizations:
         ax.set_ylabel('Cumulative xG')
         ax.set_title('Cumulative xG (steps)')
         ax.grid(True, axis='x', alpha=0.15)
-        ax.legend(loc='lower right', fontsize=8, framealpha=0.9)
+        # Make legend text visible on all backgrounds
+        legend_text_color = '#e6edf3' if self.line_color == '#d0d7de' else 'black'
+        legend = ax.legend(loc='lower right', fontsize=8, framealpha=0.9)
+        plt.setp(legend.get_texts(), color=legend_text_color)
 
 
 
