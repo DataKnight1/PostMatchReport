@@ -96,6 +96,8 @@ class MatchProcessor:
             summary['team_colors'] = self.fotmob_data.get('team_colors', {})
             summary['fotmob_possession'] = self.fotmob_data.get('possession', {})
             summary['shots_data'] = self.fotmob_data.get('shots', {})
+            if 'team_logos' in self.fotmob_data:
+                summary['team_logos'] = self.fotmob_data.get('team_logos')
         else:
             summary['xg'] = {'home_xg': 0.0, 'away_xg': 0.0}
             summary['team_colors'] = {'home_color': '#FF0000', 'away_color': '#0000FF'}

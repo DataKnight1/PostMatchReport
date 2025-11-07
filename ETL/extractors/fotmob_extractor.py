@@ -321,6 +321,30 @@ class FotMobExtractor:
         if not match_data['success']:
             return match_data
 
+        # helper to extract probable team logo URLs
+        def _extract_team_logos(md: Dict[str, Any]):
+            try:
+                data = md.get('data', {})
+                general = data.get('general', {})
+                home = general.get('homeTeam', {})
+                away = general.get('awayTeam', {})
+
+                def logo_from(team: Dict[str, Any]):
+                    if not isinstance(team, dict):
+                        return None
+                    for k in ['logoUrl', 'crest', 'teamLogo', 'teamLogoUrl', 'imageUrl', 'badgeUrl', 'logo']:
+                        v = team.get(k)
+                        if isinstance(v, str) and v.startswith('http'):
+                            return v
+                    tid = team.get('id') or team.get('teamId')
+                    if tid:
+                        return f"https://images.fotmob.com/image_resources/logo/teamlogo/{tid}.png"
+                    return None
+
+                return {'home': logo_from(home), 'away': logo_from(away)}
+            except Exception:
+                return {'home': None, 'away': None}
+
         result = {
             'match_id': match_id,
             'success': True,
@@ -329,6 +353,7 @@ class FotMobExtractor:
             'xg': self.extract_xg_data(match_data),
             'possession': self.extract_possession(match_data),
             'shots': self.extract_shots_data(match_data),
+            'team_logos': _extract_team_logos(match_data),
             'raw_data': match_data.get('data', {})
         }
 

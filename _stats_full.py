@@ -103,13 +103,9 @@ class StatisticalVisualizations:
                 return f"{int(p.get('completed_passes', 0))}/{int(p.get('total_passes', 0))}"
             def pct(x):
                 try:
-                    return f"{float(x):.1f}%"
+                    return f"{float(x):.0f}%"
                 except Exception:
                     return f"{x}"
-            # Prefer transformer shooting totals over FotMob shot summary if present
-            if isinstance(hs, dict) and 'total_shots' in hs and isinstance(as_, dict) and 'total_shots' in as_:
-                home_shots = hs.get('total_shots', home_shots)
-                away_shots = as_.get('total_shots', away_shots)
             rows = [
                 ('Possession', f"{match_info.get('possession', {}).get('home', 50):.0f}%",
                  f"{match_info.get('possession', {}).get('away', 50):.0f}%"),
@@ -189,13 +185,6 @@ class StatisticalVisualizations:
         row_bg = bg_dark if is_dark else bg_light
         alt_row_bg = (0.85, 0.85, 0.85, 0.35) if not is_dark else (0.22, 0.25, 0.30, 0.5)
 
-        def _fmt(v):
-            s = str(v)
-            # remove stray spaces inside numeric strings like "85 .4%"
-            if any(ch.isdigit() for ch in s):
-                s = s.replace(' ', '')
-            return s
-
         for i, (stat_name, home_val, away_val) in enumerate(rows):
             # Background stripe
             y0 = stats_y - (line_height / 2) + 0.01
@@ -207,10 +196,9 @@ class StatisticalVisualizations:
             # Text values
             ax.text(x_stat, stats_y, stat_name, ha='center', va='center', fontsize=10,
                     fontweight='bold', color=text_color, zorder=1, transform=ax.transAxes)
-            # Right align home, left align away
-            ax.text(x_home-0.02, stats_y, _fmt(home_val), ha='right', va='center', fontsize=10,
+            ax.text(x_home, stats_y, str(home_val), ha='center', va='center', fontsize=10,
                     color=home_color, fontweight='bold', zorder=1, transform=ax.transAxes)
-            ax.text(x_away+0.02, stats_y, _fmt(away_val), ha='left', va='center', fontsize=10,
+            ax.text(x_away, stats_y, str(away_val), ha='center', va='center', fontsize=10,
                     color=away_color, fontweight='bold', zorder=1, transform=ax.transAxes)
             stats_y -= line_height
 
@@ -231,6 +219,7 @@ class StatisticalVisualizations:
         
         for i, v in enumerate(values):
             ax.text(v, i, f' {v}', va='center', fontweight='bold')
+
 
 
 

@@ -12,108 +12,94 @@ import matplotlib.patches as patches
 class AdvancedVisualizations:
     """Create advanced analytical visualizations."""
 
+    def __init__(self, pitch_color: str = '#d6c39f', line_color: str = '#0e1117'):
+        self.pitch_color = pitch_color
+        self.line_color = line_color
+
     def create_momentum_graph(self, ax, events_df, home_id, away_id, home_color, away_color, home_name, away_name):
-        """Create enhanced match momentum/flow visualization with key events."""
+        """Net momentum around zero using weighted attacking actions.
+
+        Positive values favor home; negative favor away. Stable and less noisy.
+        """
         if events_df is None or events_df.empty:
             ax.axis('off')
-            ax.text(0.5, 0.5, 'No Data Available', ha='center', va='center')
+            txt = '#e6edf3' if getattr(self, 'line_color', '#0e1117') == '#d0d7de' else 'black'
+            ax.text(0.5, 0.5, 'No Data Available', ha='center', va='center', color=txt)
             return
 
-        # Filter to regular 90 minutes only (exclude injury/extra time)
-        events_df = events_df[events_df['cumulative_mins'] <= 90].copy()
+        df = events_df[events_df['cumulative_mins'] <= 90].copy()
+        df['weight'] = 0.0
+        shot_mask = df['type_display'].isin(['Shot', 'SavedShot', 'MissedShots', 'ShotOnPost', 'Goal'])
+        keypass_mask = df['is_key_pass'] if 'is_key_pass' in df.columns else None
+        in_final_third = df['x'].fillna(0) >= 70
+        in_box = (df['x'].fillna(0) >= 88.5) & (df['y'].fillna(0) >= 13.8) & (df['y'].fillna(0) <= 54.2)
 
-        max_time = min(events_df['cumulative_mins'].max(), 90)
-        time_bins = np.arange(0, 91, 1.5)  # Fixed to 90 minutes
+        df.loc[in_final_third, 'weight'] += 1.0
+        df.loc[in_box, 'weight'] += 1.0
+        if keypass_mask is not None:
+            try:
+                df.loc[keypass_mask == True, 'weight'] += 2.0
+            except Exception:
+                pass
+        df.loc[shot_mask, 'weight'] += 5.0 + (df.loc[shot_mask, 'xg'].fillna(0.0).clip(0, 1) * 5.0)
 
-        home_momentum, away_momentum, time_points = [], [], []
+        bins = np.arange(0, 91, 1.0)
+        centers = (bins[:-1] + bins[1:]) / 2.0
+        home_series, away_series = [], []
+        for i in range(len(bins) - 1):
+            w = df[(df['cumulative_mins'] >= bins[i]) & (df['cumulative_mins'] < bins[i+1])]
+            home_series.append(w[w['teamId'] == home_id]['weight'].sum())
+            away_series.append(w[w['teamId'] == away_id]['weight'].sum())
 
-        # Calculate momentum with weighted events
-        for i in range(len(time_bins) - 1):
-            window = events_df[
-                (events_df['cumulative_mins'] >= time_bins[i]) &
-                (events_df['cumulative_mins'] < time_bins[i + 1])
-            ]
+        import numpy as _np
+        home_series = _np.array(home_series)
+        away_series = _np.array(away_series)
+        denom = home_series + away_series
+        net = _np.where(denom > 0, (home_series - away_series) / denom * 100.0, 0.0)
 
-            if len(window) > 0:
-                # Weight dangerous events more heavily
-                home_events = window[window['teamId'] == home_id]
-                away_events = window[window['teamId'] == away_id]
-
-                # Count with weights
-                home_score = len(home_events)
-                away_score = len(away_events)
-
-                # Bonus for attacking actions
-                home_score += len(home_events[home_events['type_display'].isin(['Shot', 'SavedShot', 'MissedShots'])]) * 2
-                away_score += len(away_events[away_events['type_display'].isin(['Shot', 'SavedShot', 'MissedShots'])]) * 2
-
-                total = home_score + away_score
-                if total > 0:
-                    home_momentum.append((home_score / total) * 100)
-                    away_momentum.append((away_score / total) * 100)
-                    time_points.append((time_bins[i] + time_bins[i + 1]) / 2)
-
-        if time_points:
-            # Smooth the data
+        try:
             from scipy.ndimage import gaussian_filter1d
-            if len(home_momentum) > 5:
-                home_momentum = gaussian_filter1d(home_momentum, sigma=1.5)
-                away_momentum = gaussian_filter1d(away_momentum, sigma=1.5)
+            if len(net) > 5:
+                net = gaussian_filter1d(net, sigma=1.0)
+        except Exception:
+            pass
 
-            # Plot with gradient effect
-            ax.fill_between(time_points, 50, home_momentum, color=home_color, alpha=0.5, label=home_name)
-            ax.fill_between(time_points, 50, away_momentum, color=away_color, alpha=0.5, label=away_name)
-            ax.plot(time_points, home_momentum, color=home_color, linewidth=2, alpha=0.8)
-            ax.plot(time_points, away_momentum, color=away_color, linewidth=2, alpha=0.8)
-            ax.axhline(y=50, color='black', linestyle='--', linewidth=1.5, alpha=0.6)
+        ax.axhline(0, color='#9aa6b2', linestyle='--', linewidth=1.2, alpha=0.6)
+        ax.fill_between(centers, 0, net, where=net>=0, color=home_color, alpha=0.45, label=home_name)
+        ax.fill_between(centers, 0, net, where=net<0, color=away_color, alpha=0.45, label=away_name)
+        ax.plot(centers, net, color=home_color if (_np.nanmean(net) if hasattr(_np, 'nanmean') else 0) >= 0 else away_color, linewidth=1.4, alpha=0.9)
 
-            # Mark half-time break prominently
-            ax.axvline(x=45, color='black', linestyle='-', linewidth=2, alpha=0.4)
-            ax.text(45, 102, 'HT', ha='center', fontsize=9, fontweight='bold',
-                   color='black', bbox=dict(boxstyle='round,pad=0.3', facecolor='white', alpha=0.8))
+        ax.axvline(45, color='#9aa6b2', linestyle='-', linewidth=1.0, alpha=0.6)
+        ax.text(45, 95, 'HT', ha='center', va='center', fontsize=8,
+                color='#e6edf3' if getattr(self, 'line_color', '#0e1117') == '#d0d7de' else 'black')
 
-            # Mark goals with annotations
-            goals = events_df[events_df['type_display'] == 'Goal']
-            for idx, goal in goals.iterrows():
-                is_home = goal['teamId'] == home_id
-                color = home_color if is_home else away_color
-                y_pos = 97 if is_home else 3
+        goals = df[df['type_display'] == 'Goal']
+        for _, g in goals.iterrows():
+            is_home = g['teamId'] == home_id
+            y = 80 if is_home else -80
+            ax.scatter(g['cumulative_mins'], y, s=160, c=(home_color if is_home else away_color),
+                       marker='*', edgecolors='gold', linewidths=1.8, zorder=4)
+            lbl = f"{int(g.get('minute', g['cumulative_mins']))}'"
+            ax.text(g['cumulative_mins'], y, lbl, fontsize=7,
+                    ha='center', va='center', color='#e6edf3' if getattr(self, 'line_color', '#0e1117') == '#d0d7de' else 'black')
 
-                ax.scatter(goal['cumulative_mins'], y_pos, s=250, c=color,
-                          marker='*', edgecolors='gold', linewidths=2.5, zorder=5)
-
-                # Add minute label
-                ax.text(goal['cumulative_mins'], y_pos, f"{int(goal['minute'])}'",
-                       ha='center', va='center', fontsize=7, fontweight='bold',
-                       color='white', zorder=6)
-
-            # Mark dangerous moments (shots)
-            shots = events_df[events_df['type_display'].isin(['SavedShot', 'MissedShots'])]
-            for _, shot in shots.iterrows():
-                is_home = shot['teamId'] == home_id
-                y_pos = 90 if is_home else 10
-                color = home_color if is_home else away_color
-                ax.scatter(shot['cumulative_mins'], y_pos, s=30, c=color,
-                          marker='o', alpha=0.4, zorder=4)
-
-        # Set x-axis to 0-90 minutes
         ax.set_xlim(0, 90)
-        ax.set_ylim(0, 105)
-        ax.set_xlabel('Match Time (minutes)', fontsize=9)
-        ax.set_ylabel('Momentum %', fontsize=9)
-        ax.set_title('Match Momentum & Key Events', fontsize=12, fontweight='bold')
+        ax.set_ylim(-100, 100)
+        ax.set_yticks([-100, -50, 0, 50, 100])
+        ax.set_yticklabels(['Away', '', 'Even', '', 'Home'])
+        ax.set_xlabel('Match Time (minutes)')
+        ax.set_ylabel('Net Momentum')
+        ax.set_title('Match Momentum (net)')
         ax.legend(loc='upper left', fontsize=8, framealpha=0.9)
-        ax.grid(True, alpha=0.2, axis='x')
-
-        # Add minute markers
-        ax.set_xticks([0, 15, 30, 45, 60, 75, 90])
-        ax.set_xticklabels(['0', '15', '30', '45', '60', '75', '90'], fontsize=8)
+        ax.grid(True, alpha=0.15, axis='x')
 
     def create_xg_timeline(self, ax, shots_df, home_id, away_id, home_color, away_color):
         """Create shot timeline showing when shots were taken."""
         if shots_df is None or shots_df.empty:
             ax.axis('off')
-            ax.text(0.5, 0.5, 'No Shot Data', ha='center', va='center', fontsize=11)
+            # Pick readable color on dark
+            txt_color = '#e6edf3' if getattr(self, 'line_color', '#0e1117') == '#d0d7de' else 'black'
+            ax.text(0.5, 0.5, 'No Shot Data', ha='center', va='center', fontsize=11, color=txt_color)
             return
 
         # Filter to 90 minutes for consistency
@@ -180,9 +166,9 @@ class AdvancedVisualizations:
     def create_zone14_map(self, ax, passes_df, team_color, team_name):
         """Create Zone 14 and half-spaces visualization."""
         from mplsoccer import Pitch
-        
+
         pitch = Pitch(pitch_type='custom', pitch_length=105, pitch_width=68,
-                     pitch_color='#d6c39f', line_color='#0e1117', linewidth=1.5)
+                      pitch_color=self.pitch_color, line_color=self.line_color, linewidth=1.5)
         pitch.draw(ax=ax)
 
         # Define zones
@@ -213,3 +199,127 @@ class AdvancedVisualizations:
                     ax.scatter(p['x'], p['y'], s=30, c=team_color, alpha=0.7, zorder=4)
 
         ax.set_title(f'{team_name} Zone 14 & Half-Spaces', fontsize=12, fontweight='bold')
+
+    def create_cumulative_xg(self, ax, shots_df, home_id, away_id,
+                              home_color, away_color, home_name, away_name):
+        """Cumulative xG step chart per team with goal markers.
+
+        Uses shot events with columns: teamId, cumulative_mins, xg, type_display.
+        """
+        if shots_df is None or shots_df.empty:
+            ax.axis('off')
+            txt_color = '#e6edf3' if self.line_color == '#d0d7de' else 'black'
+            ax.text(0.5, 0.5, 'No Shot Data', ha='center', va='center', fontsize=11, color=txt_color)
+            return
+
+        cols = ['teamId', 'cumulative_mins', 'xg', 'type_display', 'x', 'y', 'qualifiers_dict', 'dist_to_goal', 'angle', 'outcome_display']
+        keep = [c for c in cols if c in shots_df.columns]
+        df = shots_df[keep].copy()
+        df = df[df['cumulative_mins'].notna()].sort_values('cumulative_mins')
+        df = df[df['cumulative_mins'] <= 90]
+
+        # Heuristic xG estimator when per-shot xG is missing or zero
+        import numpy as _np
+        def _heuristic_xg(r):
+            q = r.get('qualifiers_dict', {}) if isinstance(r.get('qualifiers_dict', {}), dict) else {}
+            t = r.get('type_display', '')
+            outcome = r.get('outcome_display', '')
+            x = float(r.get('x', _np.nan))
+            y = float(r.get('y', _np.nan))
+            d = r.get('dist_to_goal', _np.nan)
+            if not _np.isfinite(d) and _np.isfinite(x) and _np.isfinite(y):
+                d = ((105.0 - x)**2 + (34.0 - y)**2) ** 0.5
+            ang = r.get('angle', _np.nan)
+
+            if isinstance(q, dict) and 'Penalty' in q:
+                return 0.76
+
+            base = 0.02
+            in_box = _np.isfinite(x) and _np.isfinite(y) and (x >= 88.5) and (13.8 <= y <= 54.2)
+            if in_box:
+                base += 0.10
+            elif _np.isfinite(x) and x >= 70:
+                base += 0.05
+
+            if _np.isfinite(d):
+                if d < 8: base += 0.20
+                elif d < 12: base += 0.12
+                elif d < 18: base += 0.07
+                elif d < 25: base += 0.03
+
+            if _np.isfinite(ang):
+                if ang > 0.35: base += 0.05
+                elif ang > 0.25: base += 0.03
+
+            if (isinstance(q, dict) and 'Head' in q) or t == 'Head':
+                base *= 0.7
+
+            if outcome in ['SavedShot', 'ShotOnPost']:
+                base += 0.03
+            if outcome in ['MissedShots']:
+                base -= 0.01
+            if t == 'Goal':
+                base = max(base, 0.25)
+
+            return float(max(0.01, min(0.95, base)))
+
+        def _xg_used(row):
+            xv = row.get('xg', 0.0)
+            try:
+                xv = float(xv)
+            except Exception:
+                xv = 0.0
+            if xv and xv > 0:
+                return xv
+            return _heuristic_xg(row)
+
+        def build_series(team_id):
+            d = df[df['teamId'] == team_id].copy()
+            if d.empty:
+                return [0], [0]
+            times = [0.0]
+            vals = [0.0]
+            for _, r in d.iterrows():
+                t = float(r['cumulative_mins'])
+                xg = _xg_used(r)
+                times += [t, t]
+                vals += [vals[-1], vals[-1] + xg]
+            return times, vals
+
+        ht, hv = build_series(home_id)
+        at, av = build_series(away_id)
+
+        # Determine visible y-range with minimum headroom
+        import numpy as _np
+        ymax = max((_np.max(hv) if len(hv) else 0), (_np.max(av) if len(av) else 0), 0.05) * 1.25
+
+        # Filled steps for visibility
+        ax.fill_between(ht, hv, step='post', color=home_color, alpha=0.18)
+        ax.fill_between(at, av, step='post', color=away_color, alpha=0.18)
+        ax.plot(ht, hv, color=home_color, linewidth=2.2, drawstyle='steps-post', label=f'{home_name} xG')
+        ax.plot(at, av, color=away_color, linewidth=2.2, drawstyle='steps-post', label=f'{away_name} xG')
+
+        # Mark goals with stars at their time on the respective step line
+        goals = df[df['type_display'] == 'Goal']
+        for _, g in goals.iterrows():
+            is_home = g['teamId'] == home_id
+            t = float(g['cumulative_mins'])
+            series_t, series_v = (ht, hv) if is_home else (at, av)
+            y = 0.0
+            for i in range(1, len(series_t)):
+                if series_t[i] >= t:
+                    y = series_v[i-1]
+                    break
+            ax.scatter(t, y, s=160, c=(home_color if is_home else away_color), marker='*',
+                       edgecolors='gold', linewidths=1.8, zorder=4)
+
+        ax.set_xlim(0, 90)
+        ax.set_ylim(0, ymax)
+        ax.set_xlabel('Match Time (minutes)')
+        ax.set_ylabel('Cumulative xG')
+        ax.set_title('Cumulative xG (steps)')
+        ax.grid(True, axis='x', alpha=0.15)
+        ax.legend(loc='lower right', fontsize=8, framealpha=0.9)
+
+
+

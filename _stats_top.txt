@@ -1,0 +1,100 @@
+"""
+Statistical Visualizations
+Bar charts, line graphs, and statistical comparisons.
+"""
+
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+import matplotlib.patches as patches
+
+
+class StatisticalVisualizations:
+    """Create statistical visualizations."""
+
+    def create_match_summary_panel(self, ax, match_info, text_color: str = 'black'):
+        """Create match summary statistics panel.
+
+        Args:
+            ax: Matplotlib axis
+            match_info: Summary dict from MatchProcessor
+            text_color: Base text color (use 'white' for dark mode)
+        """
+        ax.axis('off')
+
+        home_name = match_info.get('teams', {}).get('home', {}).get('name', 'Home')
+        away_name = match_info.get('teams', {}).get('away', {}).get('name', 'Away')
+
+        score_text = match_info.get('match_info', {}).get('score', '0 : 0')
+        try:
+            parts = [p.strip() for p in score_text.split(':')]
+            home_score = parts[0]
+            away_score = parts[1]
+        except Exception:
+            home_score, away_score = '0', '0'
+
+        title = f"{home_name} {home_score} - {away_score} {away_name}"
+        ax.text(0.5, 0.94, title, ha='center', va='top', fontsize=18, fontweight='bold', color=text_color)
+
+        subtitle = f"{match_info.get('match_info', {}).get('venue', 'Venue')} | {match_info.get('match_info', {}).get('date', '')[:10]}"
+        ax.text(0.5, 0.89, subtitle, ha='center', va='top', fontsize=10, color=text_color, alpha=0.9)
+
+        # Stats
+        stats_y, line_height = 0.75, 0.07
+
+        # Get team stats
+        team_stats = match_info.get('team_stats', {})
+        home_stats = team_stats.get('home', {})
+        away_stats = team_stats.get('away', {})
+
+        # Get shots data (use FotMob if available, otherwise from event data)
+        shots_data = match_info.get('shots_data', {})
+        home_shots = shots_data.get('home_shots', 0) if shots_data else 0
+        away_shots = shots_data.get('away_shots', 0) if shots_data else 0
+
+        stats = [
+            ('Possession', f"{match_info.get('possession', {}).get('home', 50):.0f}%",
+             f"{match_info.get('possession', {}).get('away', 50):.0f}%"),
+            ('xG', f"{match_info.get('xg', {}).get('home_xg', 0):.2f}",
+             f"{match_info.get('xg', {}).get('away_xg', 0):.2f}"),
+            ('Shots', f"{home_shots}",
+             f"{away_shots}"),
+            ('Pass Accuracy', f"{home_stats.get('passing', {}).get('pass_accuracy', 0):.0f}%",
+             f"{away_stats.get('passing', {}).get('pass_accuracy', 0):.0f}%"),
+            ('Key Passes', f"{home_stats.get('passing', {}).get('key_passes', 0)}",
+             f"{away_stats.get('passing', {}).get('key_passes', 0)}"),
+            ('Tackles', f"{home_stats.get('defensive', {}).get('tackles', 0)}",
+             f"{away_stats.get('defensive', {}).get('tackles', 0)}"),
+        ]
+
+        home_color = match_info.get('team_colors', {}).get('home_color', '#FF0000')
+        away_color = match_info.get('team_colors', {}).get('away_color', '#0000FF')
+
+        for stat_name, home_val, away_val in stats:
+            ax.text(0.5, stats_y, stat_name, ha='center', fontsize=10, fontweight='bold', color=text_color)
+            ax.text(0.25, stats_y, home_val, ha='center', fontsize=10, color=home_color, fontweight='bold')
+            ax.text(0.75, stats_y, away_val, ha='center', fontsize=10, color=away_color, fontweight='bold')
+            stats_y -= line_height
+
+    def create_stats_comparison_bars(self, ax, team_stats, stat_name, home_color, away_color):
+        """Create horizontal bar chart comparing team stats."""
+        home_val = team_stats.get('home', {}).get(stat_name, 0)
+        away_val = team_stats.get('away', {}).get(stat_name, 0)
+
+        y_pos = [0, 1]
+        values = [home_val, away_val]
+        colors = [home_color, away_color]
+
+        ax.barh(y_pos, values, color=colors, alpha=0.7)
+        ax.set_yticks(y_pos)
+        ax.set_yticklabels(['Home', 'Away'])
+        ax.set_xlabel(stat_name)
+        ax.set_title(f'{stat_name} Comparison', fontweight='bold')
+        
+        for i, v in enumerate(values):
+            ax.text(v, i, f' {v}', va='center', fontweight='bold')
+
+
+
+
+

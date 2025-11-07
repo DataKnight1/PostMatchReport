@@ -40,11 +40,19 @@ Examples:
                        help='Cache directory (default: ./cache)')
     parser.add_argument('--clear-cache', action='store_true',
                        help='Clear cache before generation')
+    parser.add_argument('--no-colorbar', action='store_true',
+                       help='Hide colorbars in heatmaps')
+    parser.add_argument('--export-svg', action='store_true',
+                       help='Also export an SVG version alongside the image')
+    parser.add_argument('--home-logo', dest='home_logo',
+                       help='Path to home team logo image (png/jpg/svg)')
+    parser.add_argument('--away-logo', dest='away_logo',
+                       help='Path to away team logo image (png/jpg/svg)')
 
     args = parser.parse_args()
 
     # Create generator
-    generator = ReportGenerator(cache_dir=args.cache_dir)
+    generator = ReportGenerator(cache_dir=args.cache_dir, theme='dark', show_colorbars=not args.no_colorbar)
 
     # Clear cache if requested
     if args.clear_cache:
@@ -63,8 +71,21 @@ Examples:
             fotmob_id=args.fotmob_id,
             output_file=args.output,
             use_cache=not args.no_cache,
-            dpi=args.dpi
+            dpi=args.dpi,
+            home_logo_path=args.home_logo,
+            away_logo_path=args.away_logo
         )
+
+        # Optional export to SVG
+        if args.export_svg and args.output:
+            import os
+            base, _ = os.path.splitext(args.output)
+            svg_path = base + '.svg'
+            try:
+                fig.savefig(svg_path, format='svg', bbox_inches='tight', facecolor=fig.get_facecolor())
+                print(f"SVG exported to: {svg_path}")
+            except Exception as e:
+                print(f"Warning: failed to write SVG: {e}")
 
         # Display if requested
         if args.display:
