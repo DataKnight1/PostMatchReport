@@ -1,0 +1,93 @@
+# WhoScored ETL Pipeline Configuration
+
+# Extraction Settings
+extraction:
+  # Browser settings for Playwright
+  browser:
+    type: firefox  # Options: firefox, chromium, webkit
+    headless: true
+    timeout: 60000  # milliseconds
+
+  # Rate limiting (to avoid being blocked)
+  rate_limit:
+    requests_per_minute: 10
+    delay_between_requests: 6  # seconds
+
+# Transformation Settings
+transformation:
+  # Event processing
+  events:
+    # Scale coordinates to standard pitch dimensions
+    pitch_length: 105  # meters
+    pitch_width: 68    # meters
+
+    # Progressive pass threshold
+    progressive_distance: 10  # meters
+
+  # Statistics aggregation
+  statistics:
+    # Include xG calculations
+    include_xg: true
+
+    # Include shot breakdown by zone
+    include_shot_zones: true
+
+    # Include pass network data
+    include_pass_network: true
+
+# Loading Settings
+loading:
+  # Cache settings
+  cache:
+    enabled: true
+    directory: ./cache
+    ttl: 86400  # seconds (24 hours)
+
+  # Export settings
+  export:
+    directory: ./exports
+
+    # Default export formats
+    default_formats:
+      - csv
+      - json
+      - excel
+
+    # CSV settings
+    csv:
+      include_header: true
+      encoding: utf-8
+
+    # JSON settings
+    json:
+      indent: 2
+      ensure_ascii: false
+
+    # Parquet settings
+    parquet:
+      compression: snappy
+      engine: pyarrow
+
+  # Database settings
+  database:
+    # Default connection
+    # url: sqlite:///whoscored_matches.db
+    # url: postgresql://user:password@localhost:5432/matches
+
+    # Connection pool settings
+    pool_size: 5
+    max_overflow: 10
+
+    # Batch insert size
+    batch_size: 1000
+
+# Logging Settings
+logging:
+  level: INFO  # DEBUG, INFO, WARNING, ERROR
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  file: ./logs/etl.log
+
+# Match IDs for testing
+test_matches:
+  - 1946652  # FC Utrecht vs FC Porto
+  - 1716104  # Example match 2
