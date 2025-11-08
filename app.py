@@ -18,7 +18,7 @@ from Visual.pitch_visualizations import PitchVisualizations
 from Visual.statistical_visualizations import StatisticalVisualizations
 from Visual.heatmap_visualizations import HeatmapVisualizations
 from Visual.advanced_visualizations import AdvancedVisualizations
-from Visual.tactical_visualizations import TacticalVisualizations
+from Visual.tactical_visualizations import TacticalVisualizer
 
 
 # Page configuration
@@ -289,7 +289,7 @@ def generate_individual_visualization(processor, match_summary, viz_type: str, t
     stats_viz = StatisticalVisualizations(theme=theme)
     heatmap_viz = HeatmapVisualizations(theme=theme)
     advanced_viz = AdvancedVisualizations(theme=theme)
-    tactical_viz = TacticalVisualizations(theme=theme)
+    tactical_viz = TacticalVisualizer()
 
     home_team = match_summary['teams']['home']
     away_team = match_summary['teams']['away']
@@ -680,29 +680,29 @@ def main():
         # Welcome screen
         st.markdown("""
         <div class="component-card">
-            <h2>ðŸŽ¯ Welcome to PostMatchReport!</h2>
+            <h2>Welcome to PostMatchReport!</h2>
             <p style='font-size: 1.2rem; color: #4a5568; line-height: 1.8;'>
                 Generate comprehensive football match reports with 12 professional visualizations.
                 View each component separately or generate a complete combined report.
             </p>
             <br>
-            <h3>âœ¨ Features</h3>
+            <h3>Features</h3>
             <ul style='font-size: 1.1rem; color: #4a5568; line-height: 2;'>
-                <li>ðŸŽ¨ <strong>Individual Component View</strong> - Explore each visualization separately</li>
-                <li>ðŸ“Š <strong>Complete Report Generation</strong> - Professional 4Ã—3 grid layout</li>
-                <li>ðŸŒ“ <strong>Dark & Light Themes</strong> - Choose your preferred style</li>
-                <li>âš¡ <strong>High-Quality Export</strong> - Up to 300 DPI resolution</li>
-                <li>ðŸ’¾ <strong>Smart Caching</strong> - Fast reloading of previous matches</li>
+                <li><strong>Individual Component View</strong> - Explore each visualization separately</li>
+                <li><strong>Complete Report Generation</strong> - Professional 4x3 grid layout</li>
+                <li><strong>Dark & Light Themes</strong> - Choose your preferred style</li>
+                <li><strong>High-Quality Export</strong> - Up to 300 DPI resolution</li>
+                <li><strong>Smart Caching</strong> - Fast reloading of previous matches</li>
             </ul>
             <br>
             <p style='font-size: 1.1rem; color: #667eea; font-weight: 600;'>
-                ðŸ‘ˆ Enter Match IDs in the sidebar and click "Load Match Data" to begin
+                Enter Match IDs in the sidebar and click "Load Match Data" to begin
             </p>
         </div>
         """, unsafe_allow_html=True)
 
         # Example cards
-        st.markdown("<h2 style='margin-top: 3rem;'>ðŸ“¸ What You'll Get</h2>", unsafe_allow_html=True)
+        st.markdown("<h2 style='margin-top: 3rem;'>What You'll Get</h2>", unsafe_allow_html=True)
 
         col1, col2, col3 = st.columns(3)
 
