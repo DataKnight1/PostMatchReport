@@ -144,9 +144,11 @@ class PitchVisualizations:
                                  bbox_to_anchor=(0.5, -0.08, 0.0, 0.0),
                                  bbox_transform=ax.transAxes, borderpad=0)
                 cb = plt.colorbar(cm.ScalarMappable(norm=norm, cmap=cmap_obj), cax=cax, orientation='horizontal')
-                cb.outline.set_edgecolor('#9aa6b2')
-                cb.ax.tick_params(labelsize=7, colors='#e6edf3')
-                cb.set_label('xG', color='#e6edf3', fontweight='bold')
+                # Make colorbar labels visible on all backgrounds
+                label_color = '#e6edf3' if self.line_color == '#d0d7de' else 'black'
+                cb.outline.set_edgecolor('#9aa6b2' if self.line_color == '#d0d7de' else 'black')
+                cb.ax.tick_params(labelsize=7, colors=label_color)
+                cb.set_label('xG', color=label_color, fontweight='bold')
         except Exception:
             pass
 

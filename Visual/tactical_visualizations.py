@@ -125,27 +125,27 @@ class TacticalVisualizer:
 
         # Home legend
         legend_rect_home = Rectangle((legend_x_start, legend_y), 3, 2,
-                                     facecolor=home_color, edgecolor='#333333',
+                                     facecolor=home_color, edgecolor='black',
                                      alpha=0.3, linewidth=0.5)
         ax.add_patch(legend_rect_home)
         ax.text(legend_x_start + 4, legend_y + 1, home_name,
-               ha='left', va='center', fontsize=9, color='#333333')
+               ha='left', va='center', fontsize=9, color='black', fontweight='bold')
 
         # Away legend
         legend_rect_away = Rectangle((legend_x_start + 15, legend_y), 3, 2,
-                                     facecolor=away_color, edgecolor='#333333',
+                                     facecolor=away_color, edgecolor='black',
                                      alpha=0.3, linewidth=0.5)
         ax.add_patch(legend_rect_away)
         ax.text(legend_x_start + 19, legend_y + 1, away_name,
-               ha='left', va='center', fontsize=9, color='#333333')
+               ha='left', va='center', fontsize=9, color='black', fontweight='bold')
 
         # Contested legend
         legend_rect_contested = Rectangle((legend_x_start + 30, legend_y), 3, 2,
-                                         facecolor=contested_color, edgecolor='#333333',
+                                         facecolor=contested_color, edgecolor='black',
                                          alpha=0.2, linewidth=0.5)
         ax.add_patch(legend_rect_contested)
         ax.text(legend_x_start + 34, legend_y + 1, 'Contested',
-               ha='left', va='center', fontsize=9, color='#333333')
+               ha='left', va='center', fontsize=9, color='black', fontweight='bold')
 
         # Add footer note
         footer_text = f'Grid: {grid_cols}×{grid_rows} zones | Control based on touch count'
