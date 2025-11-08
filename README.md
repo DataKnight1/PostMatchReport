@@ -76,6 +76,18 @@ streamlit run app.py
 
 ## 💻 Usage Examples
 
+### Web App (Enhanced UI)
+```bash
+streamlit run app.py
+```
+**Features:**
+- 🎨 Beautiful modern UI with gradient design
+- 📊 View all 12 visualizations individually
+- 🎯 Generate complete 4×3 grid report
+- 🌓 Dark & Light theme support
+- 💾 High-quality export up to 300 DPI
+- 📥 Easy download functionality
+
 ### CLI
 ```bash
 python main.py 1716104 --fotmob-id 4193558 -o report.png --dpi 200
