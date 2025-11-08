@@ -118,7 +118,7 @@ See the `examples/` directory:
 
 ## Documentation
 
-Full documentation: [WHOSCORED_ETL_GUIDE.md](../WHOSCORED_ETL_GUIDE.md)
+Full documentation: [WHOSCORED_ETL_GUIDE.md](../docs/WHOSCORED_ETL_GUIDE.md)
 
 ## Statistics Coverage
 
@@ -168,4 +168,4 @@ Part of the PostMatchReport project.
 
 ## Support
 
-For detailed documentation, see [WHOSCORED_ETL_GUIDE.md](../WHOSCORED_ETL_GUIDE.md)
+For detailed documentation, see [WHOSCORED_ETL_GUIDE.md](../docs/WHOSCORED_ETL_GUIDE.md)
