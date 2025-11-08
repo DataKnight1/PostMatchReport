@@ -1,4 +1,4 @@
-"""
+﻿"""
 PostMatchReport - Enhanced Streamlit Web Application
 Beautiful, professional web app with separate component views and complete report generation.
 """
@@ -24,7 +24,7 @@ from Visual.tactical_visualizations import TacticalVisualizations
 # Page configuration
 st.set_page_config(
     page_title="PostMatchReport - Professional Football Analytics",
-    page_icon="⚽",
+    page_icon="âš½",
     layout="wide",
     initial_sidebar_state="expanded"
 )
@@ -553,7 +553,7 @@ def main():
     """Main application with enhanced UI."""
 
     # Header
-    st.markdown("<h1>⚽ PostMatchReport</h1>", unsafe_allow_html=True)
+    st.markdown("<h1>âš½ PostMatchReport</h1>", unsafe_allow_html=True)
     st.markdown("<p style='text-align: center; font-size: 1.2rem; color: #718096; margin-bottom: 2rem;'>Professional Football Analytics Platform</p>", unsafe_allow_html=True)
 
     # Sidebar
@@ -583,9 +583,8 @@ def main():
 
         st.markdown("---")
 
-<<<<<<< HEAD
         # Visualization Type Selection
-        st.subheader("📊 Visualization Type")
+        st.subheader("ðŸ“Š Visualization Type")
 
         viz_option = st.radio(
             "Select what to generate:",
@@ -615,7 +614,6 @@ def main():
             options=["Dark", "Light"],
             index=0,
             help="Choose the theme for visualizations"
-=======
         # Settings
         st.markdown("<h3 style='color: #e2e8f0;'>Settings</h3>", unsafe_allow_html=True)
 
@@ -624,7 +622,6 @@ def main():
             options=['dark', 'light'],
             index=0,
             help="Choose visualization theme"
->>>>>>> claude/enhance-app-layout-011CUuSK7Xj13vUtEbnhSjFx
         )
 
         dpi_setting = st.select_slider(
@@ -642,18 +639,15 @@ def main():
 
         st.markdown("---")
 
-<<<<<<< HEAD
         # Generate button
-        generate_button = st.button("🔄 Generate Visualization", type="primary")
-=======
+        generate_button = st.button("ðŸ”„ Generate Visualization", type="primary")
         # Load Data Button
-        load_button = st.button("📊 Load Match Data", type="primary")
->>>>>>> claude/enhance-app-layout-011CUuSK7Xj13vUtEbnhSjFx
+        load_button = st.button("ðŸ“Š Load Match Data", type="primary")
 
         st.markdown("---")
 
         # Help
-        with st.expander("ℹ️ How to find Match IDs"):
+        with st.expander("â„¹ï¸ How to find Match IDs"):
             st.markdown("""
             **WhoScored:**
             - Go to whoscored.com
@@ -666,8 +660,7 @@ def main():
             - Copy ID from URL: `matches/{ID}/...`
             """)
 
-<<<<<<< HEAD
-        with st.expander("📊 What's available?"):
+        with st.expander("ðŸ“Š What's available?"):
             st.markdown("""
             **Full Report:** Complete 12-panel match report with all visualizations
 
@@ -688,8 +681,7 @@ def main():
             **Pitch Control:** Territory control map showing dominant areas
 
             **Zonal Control:** Grid-based control analysis across the pitch
-=======
-        with st.expander("📋 Visualizations Included"):
+        with st.expander("ðŸ“‹ Visualizations Included"):
             st.markdown("""
             **12 Professional Visualizations:**
             1. Match Summary Panel
@@ -701,7 +693,6 @@ def main():
             7. Pitch Control Heatmap
             8. Defensive Actions (Both Teams)
             9. Zonal Control Map
->>>>>>> claude/enhance-app-layout-011CUuSK7Xj13vUtEbnhSjFx
             """)
 
     # Main content
@@ -709,36 +700,36 @@ def main():
         # Welcome screen
         st.markdown("""
         <div class="component-card">
-            <h2>🎯 Welcome to PostMatchReport!</h2>
+            <h2>ðŸŽ¯ Welcome to PostMatchReport!</h2>
             <p style='font-size: 1.2rem; color: #4a5568; line-height: 1.8;'>
                 Generate comprehensive football match reports with 12 professional visualizations.
                 View each component separately or generate a complete combined report.
             </p>
             <br>
-            <h3>✨ Features</h3>
+            <h3>âœ¨ Features</h3>
             <ul style='font-size: 1.1rem; color: #4a5568; line-height: 2;'>
-                <li>🎨 <strong>Individual Component View</strong> - Explore each visualization separately</li>
-                <li>📊 <strong>Complete Report Generation</strong> - Professional 4×3 grid layout</li>
-                <li>🌓 <strong>Dark & Light Themes</strong> - Choose your preferred style</li>
-                <li>⚡ <strong>High-Quality Export</strong> - Up to 300 DPI resolution</li>
-                <li>💾 <strong>Smart Caching</strong> - Fast reloading of previous matches</li>
+                <li>ðŸŽ¨ <strong>Individual Component View</strong> - Explore each visualization separately</li>
+                <li>ðŸ“Š <strong>Complete Report Generation</strong> - Professional 4Ã—3 grid layout</li>
+                <li>ðŸŒ“ <strong>Dark & Light Themes</strong> - Choose your preferred style</li>
+                <li>âš¡ <strong>High-Quality Export</strong> - Up to 300 DPI resolution</li>
+                <li>ðŸ’¾ <strong>Smart Caching</strong> - Fast reloading of previous matches</li>
             </ul>
             <br>
             <p style='font-size: 1.1rem; color: #667eea; font-weight: 600;'>
-                👈 Enter Match IDs in the sidebar and click "Load Match Data" to begin
+                ðŸ‘ˆ Enter Match IDs in the sidebar and click "Load Match Data" to begin
             </p>
         </div>
         """, unsafe_allow_html=True)
 
         # Example cards
-        st.markdown("<h2 style='margin-top: 3rem;'>📸 What You'll Get</h2>", unsafe_allow_html=True)
+        st.markdown("<h2 style='margin-top: 3rem;'>ðŸ“¸ What You'll Get</h2>", unsafe_allow_html=True)
 
         col1, col2, col3 = st.columns(3)
 
         with col1:
             st.markdown("""
             <div class="stats-card">
-                <h3>🎯 Shot Analysis</h3>
+                <h3>ðŸŽ¯ Shot Analysis</h3>
                 <p>All shots with xG values, outcomes, and field positions</p>
             </div>
             """, unsafe_allow_html=True)
@@ -746,7 +737,7 @@ def main():
         with col2:
             st.markdown("""
             <div class="stats-card">
-                <h3>🔗 Pass Networks</h3>
+                <h3>ðŸ”— Pass Networks</h3>
                 <p>Team passing patterns and player connections with average positions</p>
             </div>
             """, unsafe_allow_html=True)
@@ -754,14 +745,13 @@ def main():
         with col3:
             st.markdown("""
             <div class="stats-card">
-                <h3>🔥 Heat Maps</h3>
+                <h3>ðŸ”¥ Heat Maps</h3>
                 <p>Defensive pressure, pitch control, and territorial analysis</p>
             </div>
             """, unsafe_allow_html=True)
 
         return
 
-<<<<<<< HEAD
         # Map visualization options to internal keys
         viz_type_map = {
             "Full Report": "full_report",
@@ -779,7 +769,7 @@ def main():
         selected_viz_type = viz_type_map[viz_option]
         theme = theme_option.lower()
 
-        spinner_text = "🔄 Generating visualization... This may take a few minutes..." if selected_viz_type != "full_report" else "🔄 Generating full match report... This may take a few minutes..."
+        spinner_text = "ðŸ”„ Generating visualization... This may take a few minutes..." if selected_viz_type != "full_report" else "ðŸ”„ Generating full match report... This may take a few minutes..."
 
         with st.spinner(spinner_text):
             try:
@@ -791,21 +781,19 @@ def main():
                 else:
                     fig, match_summary = generate_specific_visualization(whoscored_id, fotmob_id_value,
                                                                          viz_type=selected_viz_type, theme=theme)
-=======
     # Load match data
     if load_button or 'match_loaded' in st.session_state:
         if load_button:
             if whoscored_id < 1:
-                st.error("❌ Please enter a valid WhoScored Match ID")
+                st.error("âŒ Please enter a valid WhoScored Match ID")
                 return
 
-            with st.spinner("🔄 Loading match data..."):
+            with st.spinner("ðŸ”„ Loading match data..."):
                 try:
                     fotmob_id_value = fotmob_id if fotmob_id > 0 else None
                     whoscored_data, fotmob_data, processor, match_summary = load_match_data(
                         whoscored_id, fotmob_id_value, use_cache
                     )
->>>>>>> claude/enhance-app-layout-011CUuSK7Xj13vUtEbnhSjFx
 
                     # Store in session state
                     st.session_state['match_loaded'] = True
@@ -816,10 +804,10 @@ def main():
                     st.session_state['theme'] = theme
                     st.session_state['dpi'] = dpi_setting
 
-                    st.success("✅ Match data loaded successfully!")
+                    st.success("âœ… Match data loaded successfully!")
 
                 except Exception as e:
-                    st.error(f"❌ Error loading match data: {str(e)}")
+                    st.error(f"âŒ Error loading match data: {str(e)}")
                     st.exception(e)
                     return
 
@@ -845,7 +833,7 @@ def main():
                 {home_name} <span style='font-weight: 900;'>{home_score} - {away_score}</span> {away_name}
             </h2>
             <p style='text-align: center; font-size: 1.3rem;'>
-                <strong>{league}</strong> • {date} • {venue}
+                <strong>{league}</strong> â€¢ {date} â€¢ {venue}
             </p>
         </div>
         """, unsafe_allow_html=True)
@@ -857,7 +845,7 @@ def main():
             home_poss = match_summary['possession'].get('home', 50)
             away_poss = match_summary['possession'].get('away', 50)
             st.metric(
-                "⚪ Possession",
+                "âšª Possession",
                 f"{home_poss:.0f}% - {away_poss:.0f}%"
             )
 
@@ -865,7 +853,7 @@ def main():
             home_xg = match_summary['xg'].get('home_xg', 0)
             away_xg = match_summary['xg'].get('away_xg', 0)
             st.metric(
-                "🎯 Expected Goals",
+                "ðŸŽ¯ Expected Goals",
                 f"{home_xg:.2f} - {away_xg:.2f}"
             )
 
@@ -874,7 +862,7 @@ def main():
             home_shots = shots_data.get('home_shots', 0)
             away_shots = shots_data.get('away_shots', 0)
             st.metric(
-                "⚽ Shots",
+                "âš½ Shots",
                 f"{home_shots} - {away_shots}"
             )
 
@@ -882,7 +870,7 @@ def main():
             home_sot = shots_data.get('home_shots_on_target', 0)
             away_sot = shots_data.get('away_shots_on_target', 0)
             st.metric(
-                "🎪 On Target",
+                "ðŸŽª On Target",
                 f"{home_sot} - {away_sot}"
             )
 
@@ -890,9 +878,9 @@ def main():
 
         # Tabbed interface
         tab1, tab2, tab3 = st.tabs([
-            "📊 Individual Components",
-            "🎨 Complete Report",
-            "💾 Download & Export"
+            "ðŸ“Š Individual Components",
+            "ðŸŽ¨ Complete Report",
+            "ðŸ’¾ Download & Export"
         ])
 
         with tab1:
@@ -900,44 +888,44 @@ def main():
             st.markdown("<p style='font-size: 1.1rem; color: #718096;'>Explore each analysis component separately with full detail</p>", unsafe_allow_html=True)
 
             # Component categories
-            st.markdown("<h3 style='margin-top: 2rem;'>⚽ Overview & Statistics</h3>", unsafe_allow_html=True)
+            st.markdown("<h3 style='margin-top: 2rem;'>âš½ Overview & Statistics</h3>", unsafe_allow_html=True)
 
             col1, col2 = st.columns(2)
 
             with col1:
-                if st.button("📋 Match Summary Panel", use_container_width=True):
+                if st.button("ðŸ“‹ Match Summary Panel", use_container_width=True):
                     with st.spinner("Generating Match Summary..."):
                         fig = generate_individual_visualization(processor, match_summary, "match_summary", theme)
                         st.pyplot(fig)
                         plt.close(fig)
 
             with col2:
-                if st.button("📈 Match Momentum Graph", use_container_width=True):
+                if st.button("ðŸ“ˆ Match Momentum Graph", use_container_width=True):
                     with st.spinner("Generating Momentum Graph..."):
                         fig = generate_individual_visualization(processor, match_summary, "momentum", theme)
                         st.pyplot(fig)
                         plt.close(fig)
 
-            st.markdown("<h3 style='margin-top: 2rem;'>🎯 Attacking Analysis</h3>", unsafe_allow_html=True)
+            st.markdown("<h3 style='margin-top: 2rem;'>ðŸŽ¯ Attacking Analysis</h3>", unsafe_allow_html=True)
 
             col1, col2, col3 = st.columns(3)
 
             with col1:
-                if st.button("🥅 Shot Map with xG", use_container_width=True):
+                if st.button("ðŸ¥… Shot Map with xG", use_container_width=True):
                     with st.spinner("Generating Shot Map..."):
                         fig = generate_individual_visualization(processor, match_summary, "shot_map", theme)
                         st.pyplot(fig)
                         plt.close(fig)
 
             with col2:
-                if st.button(f"🔗 Pass Network - {home_name}", use_container_width=True):
+                if st.button(f"ðŸ”— Pass Network - {home_name}", use_container_width=True):
                     with st.spinner(f"Generating Pass Network for {home_name}..."):
                         fig = generate_individual_visualization(processor, match_summary, "pass_network_home", theme)
                         st.pyplot(fig)
                         plt.close(fig)
 
             with col3:
-                if st.button(f"🔗 Pass Network - {away_name}", use_container_width=True):
+                if st.button(f"ðŸ”— Pass Network - {away_name}", use_container_width=True):
                     with st.spinner(f"Generating Pass Network for {away_name}..."):
                         fig = generate_individual_visualization(processor, match_summary, "pass_network_away", theme)
                         st.pyplot(fig)
@@ -946,46 +934,46 @@ def main():
             col1, col2, col3 = st.columns(3)
 
             with col1:
-                if st.button("📊 Cumulative xG Timeline", use_container_width=True):
+                if st.button("ðŸ“Š Cumulative xG Timeline", use_container_width=True):
                     with st.spinner("Generating xG Timeline..."):
                         fig = generate_individual_visualization(processor, match_summary, "xg_timeline", theme)
                         st.pyplot(fig)
                         plt.close(fig)
 
             with col2:
-                if st.button(f"🎯 Zone 14 - {home_name}", use_container_width=True):
+                if st.button(f"ðŸŽ¯ Zone 14 - {home_name}", use_container_width=True):
                     with st.spinner(f"Generating Zone 14 for {home_name}..."):
                         fig = generate_individual_visualization(processor, match_summary, "zone14_home", theme)
                         st.pyplot(fig)
                         plt.close(fig)
 
             with col3:
-                if st.button(f"🎯 Zone 14 - {away_name}", use_container_width=True):
+                if st.button(f"ðŸŽ¯ Zone 14 - {away_name}", use_container_width=True):
                     with st.spinner(f"Generating Zone 14 for {away_name}..."):
                         fig = generate_individual_visualization(processor, match_summary, "zone14_away", theme)
                         st.pyplot(fig)
                         plt.close(fig)
 
-            st.markdown("<h3 style='margin-top: 2rem;'>🛡️ Defensive & Territorial Analysis</h3>", unsafe_allow_html=True)
+            st.markdown("<h3 style='margin-top: 2rem;'>ðŸ›¡ï¸ Defensive & Territorial Analysis</h3>", unsafe_allow_html=True)
 
             col1, col2, col3 = st.columns(3)
 
             with col1:
-                if st.button("🗺️ Pitch Control Map", use_container_width=True):
+                if st.button("ðŸ—ºï¸ Pitch Control Map", use_container_width=True):
                     with st.spinner("Generating Pitch Control..."):
                         fig = generate_individual_visualization(processor, match_summary, "pitch_control", theme)
                         st.pyplot(fig)
                         plt.close(fig)
 
             with col2:
-                if st.button(f"🛡️ Defensive Actions - {home_name}", use_container_width=True):
+                if st.button(f"ðŸ›¡ï¸ Defensive Actions - {home_name}", use_container_width=True):
                     with st.spinner(f"Generating Defensive Heatmap for {home_name}..."):
                         fig = generate_individual_visualization(processor, match_summary, "defensive_home", theme)
                         st.pyplot(fig)
                         plt.close(fig)
 
             with col3:
-                if st.button(f"🛡️ Defensive Actions - {away_name}", use_container_width=True):
+                if st.button(f"ðŸ›¡ï¸ Defensive Actions - {away_name}", use_container_width=True):
                     with st.spinner(f"Generating Defensive Heatmap for {away_name}..."):
                         fig = generate_individual_visualization(processor, match_summary, "defensive_away", theme)
                         st.pyplot(fig)
@@ -994,7 +982,7 @@ def main():
             col1, col2, col3 = st.columns([1, 1, 1])
 
             with col2:
-                if st.button("🎯 Zonal Control Map", use_container_width=True):
+                if st.button("ðŸŽ¯ Zonal Control Map", use_container_width=True):
                     with st.spinner("Generating Zonal Control..."):
                         fig = generate_individual_visualization(processor, match_summary, "zonal_control", theme)
                         st.pyplot(fig)
@@ -1002,13 +990,13 @@ def main():
 
         with tab2:
             st.markdown("<h2>Complete Match Report</h2>", unsafe_allow_html=True)
-            st.markdown("<p style='font-size: 1.1rem; color: #718096;'>All 12 visualizations in a professional 4×3 grid layout</p>", unsafe_allow_html=True)
+            st.markdown("<p style='font-size: 1.1rem; color: #718096;'>All 12 visualizations in a professional 4Ã—3 grid layout</p>", unsafe_allow_html=True)
 
-            generate_report_btn = st.button("🎨 Generate Complete Report", type="primary", use_container_width=True)
+            generate_report_btn = st.button("ðŸŽ¨ Generate Complete Report", type="primary", use_container_width=True)
 
             if generate_report_btn or 'complete_report' in st.session_state:
                 if generate_report_btn:
-                    with st.spinner("🎨 Generating complete report... This may take a minute..."):
+                    with st.spinner("ðŸŽ¨ Generating complete report... This may take a minute..."):
                         try:
                             fig = generate_complete_report(
                                 st.session_state['whoscored_id'],
@@ -1017,9 +1005,9 @@ def main():
                                 dpi_setting
                             )
                             st.session_state['complete_report'] = fig
-                            st.success("✅ Complete report generated!")
+                            st.success("âœ… Complete report generated!")
                         except Exception as e:
-                            st.error(f"❌ Error generating report: {str(e)}")
+                            st.error(f"âŒ Error generating report: {str(e)}")
                             st.exception(e)
                             return
 
@@ -1039,12 +1027,11 @@ def main():
             if 'complete_report' in st.session_state:
                 st.markdown("""
                 <div class="download-section">
-                    <h3>📥 Your Report is Ready!</h3>
+                    <h3>ðŸ“¥ Your Report is Ready!</h3>
                     <p style='font-size: 1.1rem; color: #4a5568;'>Download the complete match report in high quality</p>
                 </div>
                 """, unsafe_allow_html=True)
 
-<<<<<<< HEAD
                 # Display stats summary
                 col1, col2, col3, col4 = st.columns(4)
 
@@ -1083,19 +1070,19 @@ def main():
 
                 # Display report with appropriate title
                 viz_display_names = {
-                    "full_report": "📊 Full Match Report",
-                    "statistics": "📈 Match Statistics",
-                    "shot_map": "🎯 Shot Map",
-                    "pass_network": "🔗 Pass Network",
-                    "momentum": "📊 Match Momentum",
-                    "xg_timeline": "📈 xG Timeline",
-                    "zone14": "⚡ Zone 14 & Half-Spaces",
-                    "defensive_actions": "🛡️ Defensive Actions",
-                    "pitch_control": "🗺️ Pitch Control",
-                    "zonal_control": "🎯 Zonal Control"
+                    "full_report": "ðŸ“Š Full Match Report",
+                    "statistics": "ðŸ“ˆ Match Statistics",
+                    "shot_map": "ðŸŽ¯ Shot Map",
+                    "pass_network": "ðŸ”— Pass Network",
+                    "momentum": "ðŸ“Š Match Momentum",
+                    "xg_timeline": "ðŸ“ˆ xG Timeline",
+                    "zone14": "âš¡ Zone 14 & Half-Spaces",
+                    "defensive_actions": "ðŸ›¡ï¸ Defensive Actions",
+                    "pitch_control": "ðŸ—ºï¸ Pitch Control",
+                    "zonal_control": "ðŸŽ¯ Zonal Control"
                 }
 
-                st.subheader(viz_display_names.get(selected_viz_type, "📊 Match Report"))
+                st.subheader(viz_display_names.get(selected_viz_type, "ðŸ“Š Match Report"))
 
                 # Convert figure to image
                 img_str = fig_to_base64(fig, dpi=dpi_setting)
@@ -1119,7 +1106,7 @@ def main():
                 filename = f"{home_name}_{away_name}_{datetime.now().strftime('%Y%m%d')}_{viz_filename_suffix}.png"
                 filename = filename.replace(' ', '_')
 
-                download_label = f"📥 Download {viz_option}" if selected_viz_type != "full_report" else "📥 Download Full Report"
+                download_label = f"ðŸ“¥ Download {viz_option}" if selected_viz_type != "full_report" else "ðŸ“¥ Download Full Report"
                 col1, col2, col3 = st.columns([1, 2, 1])
 
                 with col2:
@@ -1131,12 +1118,12 @@ def main():
                         use_container_width=True
                     )
 
-                success_message = f"✅ {viz_option} generated successfully!" if selected_viz_type != "full_report" else "✅ Full report generated successfully!"
+                success_message = f"âœ… {viz_option} generated successfully!" if selected_viz_type != "full_report" else "âœ… Full report generated successfully!"
                 st.success(success_message)
 
                 # Export options
                 st.markdown("---")
-                st.markdown("<h3>⚙️ Export Settings</h3>", unsafe_allow_html=True)
+                st.markdown("<h3>âš™ï¸ Export Settings</h3>", unsafe_allow_html=True)
 
                 col1, col2 = st.columns(2)
 
@@ -1149,14 +1136,14 @@ def main():
                     st.info(f"**Match:** {home_name} vs {away_name}")
 
             else:
-                st.info("👆 Generate the complete report first in the 'Complete Report' tab to enable download options")
+                st.info("ðŸ‘† Generate the complete report first in the 'Complete Report' tab to enable download options")
 
     # Footer
     st.markdown("---")
     st.markdown("""
     <div class="footer">
         <p style='font-size: 1.1rem; font-weight: 600;'>PostMatchReport - Professional Football Analytics</p>
-        <p style='font-size: 0.9rem;'>Data from WhoScored & FotMob • Built with Python & Streamlit</p>
+        <p style='font-size: 0.9rem;'>Data from WhoScored & FotMob â€¢ Built with Python & Streamlit</p>
     </div>
     """, unsafe_allow_html=True)
 
