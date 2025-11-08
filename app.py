@@ -281,72 +281,110 @@ def generate_complete_report(whoscored_id: int, fotmob_id: int = None, theme: st
 
 
 def generate_individual_visualization(processor, match_summary, viz_type: str, theme: str = 'dark'):
-    """Generate individual visualization based on type."""
+    """Generate individual visualization based on type (no reloads)."""
     fig, ax = plt.subplots(figsize=(12, 8), facecolor=('#0e1117' if theme == 'dark' else 'white'))
 
-    # Initialize visualization classes
-    pitch_viz = PitchVisualizations(theme=theme)
-    stats_viz = StatisticalVisualizations(theme=theme)
-    heatmap_viz = HeatmapVisualizations(theme=theme)
-    advanced_viz = AdvancedVisualizations(theme=theme)
+    # Theme colors for pitch modules
+    if theme == 'dark':
+        pitch_color, line_color = '#2b313a', '#d0d7de'
+        text_color = '#e6edf3'
+    else:
+        pitch_color, line_color = '#d6c39f', '#0e1117'
+        text_color = 'black'
+
+    pitch_viz = PitchVisualizations(pitch_color=pitch_color, line_color=line_color)
+    stats_viz = StatisticalVisualizations()
+    heatmap_viz = HeatmapVisualizations(pitch_color=pitch_color, line_color=line_color)
+    advanced_viz = AdvancedVisualizations(pitch_color=pitch_color, line_color=line_color)
     tactical_viz = TacticalVisualizer()
 
-    home_team = match_summary['teams']['home']
-    away_team = match_summary['teams']['away']
+    # Team context
+    home_id = match_summary['teams']['home']['id']
+    away_id = match_summary['teams']['away']['id']
+    home_name = match_summary['teams']['home']['name']
+    away_name = match_summary['teams']['away']['name']
+    home_color = match_summary.get('team_colors', {}).get('home_color', '#FF0000')
+    away_color = match_summary.get('team_colors', {}).get('away_color', '#0000FF')
 
     try:
         if viz_type == "shot_map":
-            shots = processor.get_shots()
-            pitch_viz.create_shot_map(ax, shots, home_team, away_team)
+            shots_home = processor.get_shots(home_id)
+            shots_away = processor.get_shots(away_id)
+            pitch_viz.create_xg_shot_map(ax, shots_home, shots_away, home_color, away_color)
 
         elif viz_type == "match_summary":
-            stats_viz.create_match_summary_panel(ax, match_summary)
+            stats_viz.create_match_summary_panel(ax, match_summary, text_color=text_color)
 
         elif viz_type == "momentum":
-            timeline = processor.get_momentum_timeline()
-            advanced_viz.create_momentum_graph(ax, timeline, home_team, away_team)
+            events_df = processor.get_events_dataframe()
+            advanced_viz.create_momentum_graph(
+                ax, events_df, home_id, away_id, home_color, away_color, home_name, away_name
+            )
 
         elif viz_type == "pass_network_home":
-            passes = processor.get_passes(team_id=home_team['id'], successful_only=True)
-            positions = processor.get_player_positions(team_id=home_team['id'])
-            pitch_viz.create_pass_network(ax, passes, positions, home_team)
+            positions, connections = processor.get_pass_network_data(home_id, min_passes=3)
+            pitch_viz.create_pass_network(ax, positions, connections, home_color, home_name)
 
         elif viz_type == "pass_network_away":
-            passes = processor.get_passes(team_id=away_team['id'], successful_only=True)
-            positions = processor.get_player_positions(team_id=away_team['id'])
-            pitch_viz.create_pass_network(ax, passes, positions, away_team)
+            positions, connections = processor.get_pass_network_data(away_id, min_passes=3)
+            pitch_viz.create_pass_network(ax, positions, connections, away_color, away_name)
 
         elif viz_type == "xg_timeline":
-            xg_events = processor.get_xg_timeline()
-            advanced_viz.create_cumulative_xg_chart(ax, xg_events, home_team, away_team)
+            shots_home = processor.get_shots(home_id)
+            shots_away = processor.get_shots(away_id)
+            all_shots = (
+                pd.concat([shots_home, shots_away])
+                if (shots_home is not None and not shots_home.empty) or (shots_away is not None and not shots_away.empty)
+                else pd.DataFrame()
+            )
+            advanced_viz.create_cumulative_xg(
+                ax, all_shots, home_id, away_id, home_color, away_color, home_name, away_name
+            )
 
         elif viz_type == "zone14_home":
-            zone14_events = processor.get_zone14_events(team_id=home_team['id'])
-            advanced_viz.create_zone14_map(ax, zone14_events, home_team)
+            passes_home = processor.get_passes(team_id=home_id, successful_only=True)
+            advanced_viz.create_zone14_map(ax, passes_home, home_color, home_name)
 
         elif viz_type == "zone14_away":
-            zone14_events = processor.get_zone14_events(team_id=away_team['id'])
-            advanced_viz.create_zone14_map(ax, zone14_events, away_team)
+            passes_away = processor.get_passes(team_id=away_id, successful_only=True)
+            advanced_viz.create_zone14_map(ax, passes_away, away_color, away_name)
 
         elif viz_type == "pitch_control":
-            events = processor.get_events_for_heatmap()
-            heatmap_viz.create_pitch_control_heatmap(ax, events, home_team, away_team)
+            events_df = processor.get_events_dataframe()
+            heatmap_viz.create_pitch_control_map(
+                ax,
+                events_df[events_df['teamId'] == home_id],
+                events_df[events_df['teamId'] == away_id],
+                home_color,
+                away_color,
+            )
 
         elif viz_type == "defensive_home":
-            defensive_events = processor.get_defensive_events(team_id=home_team['id'])
-            heatmap_viz.create_defensive_heatmap(ax, defensive_events, home_team)
+            def_actions = processor.get_defensive_actions(home_id)
+            heatmap_viz.create_defensive_actions_heatmap(ax, def_actions, home_color, home_name)
 
         elif viz_type == "defensive_away":
-            defensive_events = processor.get_defensive_events(team_id=away_team['id'])
-            heatmap_viz.create_defensive_heatmap(ax, defensive_events, away_team)
+            def_actions = processor.get_defensive_actions(away_id)
+            heatmap_viz.create_defensive_actions_heatmap(ax, def_actions, away_color, away_name)
 
         elif viz_type == "zonal_control":
-            events = processor.get_events_for_heatmap()
-            tactical_viz.create_zonal_control_map(ax, events, home_team, away_team)
+            zone_matrix = processor.event_processor.calculate_zonal_control(home_id, away_id, grid_cols=6, grid_rows=4)
+            home_team_info = {"name": home_name, "id": home_id}
+            away_team_info = {"name": away_name, "id": away_id}
+            tactical_viz.create_zonal_control_map(
+                ax, zone_matrix, home_team_info, away_team_info, home_color, away_color, 'right', 'left'
+            )
 
     except Exception as e:
-        ax.text(0.5, 0.5, f'Error generating visualization:\n{str(e)}',
-                ha='center', va='center', transform=ax.transAxes)
+        ax.text(
+            0.5,
+            0.5,
+            f"Error generating visualization:\n{str(e)}",
+            ha='center',
+            va='center',
+            transform=ax.transAxes,
+            color=(text_color or 'black'),
+        )
 
     plt.tight_layout()
     return fig
@@ -1049,12 +1087,11 @@ def main():
                     )
 
                 st.markdown("---")
-
+                selected_viz_type = 'full_report'
                 # Display report with appropriate title
                 viz_display_names = {"full_report": "Full Match Report","statistics": "Match Statistics","shot_map": "Shot Map","pass_network": "Pass Network","momentum": "Match Momentum","xg_timeline": "xG Timeline","zone14": "Zone 14 & Half-Spaces","defensive_actions": "Defensive Actions","pitch_control": "Pitch Control","zonal_control": "Zonal Control"}
 
                 st.subheader(viz_display_names.get(selected_viz_type, "Match Report"))
-
                 # Convert figure to image
                 img_str = fig_to_base64(fig, dpi=dpi_setting)
 
@@ -1089,8 +1126,7 @@ def main():
                         use_container_width=True
                     )
 
-                success_message = f"âœ… {viz_option} generated successfully!" if selected_viz_type != "full_report" else "âœ… Full report generated successfully!"
-                st.success(success_message)
+                st.success("Full report generated successfully!")
 
                 # Export options
                 st.markdown("---")
@@ -1125,6 +1161,8 @@ if __name__ == "__main__":
 
     # Run app
     main()
+
+
 
 
 
