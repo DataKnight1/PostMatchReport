@@ -1,0 +1,187 @@
+╔═══════════════════════════════════════════════════════════════════════════════╗
+║                     POSTMATCHREPORT - QUICK REFERENCE                         ║
+║                    Visualization Components at a Glance                        ║
+╚═══════════════════════════════════════════════════════════════════════════════╝
+
+12 VISUALIZATIONS IN 5 MODULES:
+
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ MODULE 1: PITCH_VISUALIZATIONS                                              ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫
+┃ • create_xg_shot_map()         → Row 1, Col 1: All shots with xG coloring   ┃
+┃ • create_pass_network()        → Row 2, Col 0+2: Player positions + flows  ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ MODULE 2: STATISTICAL_VISUALIZATIONS                                        ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫
+┃ • create_match_summary_panel() → Row 1, Col 0: Score, stats, team badges   ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ MODULE 3: HEATMAP_VISUALIZATIONS                                            ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫
+┃ • create_defensive_actions_heatmap() → Row 4, Col 0+2: Tackles/blocks heat ┃
+┃ • create_pitch_control_map()         → Row 3, Col 1: Territory dominance   ┃
+┃ • create_touch_heatmap()             → Backup for Row 4, Col 1 if needed   ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ MODULE 4: ADVANCED_VISUALIZATIONS                                           ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫
+┃ • create_momentum_graph()       → Row 1, Col 2: Match momentum over time   ┃
+┃ • create_cumulative_xg()        → Row 2, Col 1: xG accumulation chart      ┃
+┃ • create_zone14_map()           → Row 3, Col 0+2: Critical attacking zones ┃
+┃ • create_xg_timeline()          → Alternate shot timeline visualization     ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ MODULE 5: TACTICAL_VISUALIZATIONS                                           ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫
+┃ • create_zonal_control_map()    → Row 4, Col 1: Grid-based territorial map ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+
+DATA SOURCES:
+
+Shots:               MatchProcessor.get_shots(team_id)
+Passes:              MatchProcessor.get_passes(team_id, successful_only=True)
+Events:              MatchProcessor.get_events_dataframe()
+Defensive Actions:   MatchProcessor.get_defensive_actions(team_id)
+Pass Network:        MatchProcessor.get_pass_network_data(team_id, min_passes=3)
+Match Summary:       MatchProcessor.get_complete_match_summary()
+Zonal Control:       MatchProcessor.calculate_zonal_control(home_id, away_id)
+
+
+KEY METHODS:
+
+PitchVisualizations
+├─ __init__(pitch_color='#d6c39f', line_color='#0e1117')
+├─ create_xg_shot_map(ax, shots_home, shots_away, home_color, away_color)
+└─ create_pass_network(ax, positions_df, connections_df, color, name)
+
+StatisticalVisualizations
+├─ __init__()
+└─ create_match_summary_panel(ax, match_info, text_color)
+
+HeatmapVisualizations
+├─ __init__(pitch_color, line_color, show_colorbars=True)
+├─ create_defensive_actions_heatmap(ax, actions_df, team_color, team_name)
+├─ create_pitch_control_map(ax, home_events, away_events, colors)
+└─ create_touch_heatmap(ax, events_df, team_color, team_name)
+
+AdvancedVisualizations
+├─ __init__(pitch_color, line_color)
+├─ create_momentum_graph(ax, events_df, home_id, away_id, colors, names)
+├─ create_cumulative_xg(ax, shots_df, home_id, away_id, colors, names)
+└─ create_zone14_map(ax, passes_df, team_color, team_name)
+
+TacticalVisualizer
+├─ __init__()
+└─ create_zonal_control_map(ax, zone_matrix, home_team, away_team, colors)
+
+
+GRID LAYOUT:
+
+       ┌───────────┬───────────┬──────────┐
+    0  │  Summary  │   xG Map  │ Momentum │
+       ├───────────┼───────────┼──────────┤
+    1  │ Home Pass │  Cum xG   │ Away Pass│
+       ├───────────┼───────────┼──────────┤
+    2  │ Zone 14 H │ Pitch Ctrl│Zone 14 A │
+       ├───────────┼───────────┼──────────┤
+    3  │  Def Hm   │ Zonal Map │ Def Away │
+       └───────────┴───────────┴──────────┘
+
+
+COLORS:
+
+Dark Mode:
+├─ Background: #22272e
+├─ Text: #e6edf3
+├─ Pitch: #2b313a
+└─ Lines: #d0d7de
+
+Light Mode:
+├─ Background: #f0f0f0
+├─ Text: black
+├─ Pitch: #d6c39f
+└─ Lines: #0e1117
+
+Dynamic:
+├─ Home: FotMob data (default: #FF0000)
+└─ Away: FotMob data (default: #0000FF)
+
+
+PITCH ZONES:
+
+Zone 14:          x: 70-87.5,  y: 20.4-47.6
+Left Half-Space:  x: 70-87.5,  y: 10.2-27.2
+Right Half-Space: x: 70-87.5,  y: 40.8-57.8
+Penalty Box:      x: 88.5-105, y: 13.8-54.2
+Final Third:      x: 70-105
+
+
+EXAMPLE: DISPLAY SINGLE VISUALIZATION
+
+    from Visual.pitch_visualizations import PitchVisualizations
+    import matplotlib.pyplot as plt
+    
+    fig, ax = plt.subplots(figsize=(10, 8))
+    viz = PitchVisualizations(pitch_color='#2b313a', line_color='#d0d7de')
+    
+    # Get data
+    home_pos, home_conn = processor.get_pass_network_data(home_id)
+    
+    # Render
+    viz.create_pass_network(ax, home_pos, home_conn, '#FF0000', 'Home')
+    plt.show()
+
+
+CUSTOMIZATION PARAMETERS:
+
+Pass Network:
+├─ MAX_LINE_WIDTH: 10      (line thickness)
+├─ MAX_MARKER_SIZE: 3000   (player circle size)
+└─ MIN_TRANSPARENCY: 0.3
+
+Heatmap:
+├─ Grid: 21×14 (defensive), 7×6 (pitch control)
+├─ Gaussian sigma: 1.0-1.5
+└─ Alpha: 0.2-0.8
+
+Zonal Control:
+├─ Grid: 6×4 (configurable)
+└─ Colors: team_color (0.3 alpha)
+
+Momentum:
+├─ Shot weight: 5.0 + (5.0 × xG)
+├─ Key pass: 2.0
+├─ Final third: 1.0
+└─ Gaussian sigma: 1.0
+
+
+FILES:
+
+/home/user/PostMatchReport/Visual/
+├─ __init__.py                       (imports all classes)
+├─ pitch_visualizations.py           (PitchVisualizations)
+├─ statistical_visualizations.py     (StatisticalVisualizations)
+├─ heatmap_visualizations.py         (HeatmapVisualizations)
+├─ advanced_visualizations.py        (AdvancedVisualizations)
+└─ tactical_visualizations.py        (TacticalVisualizer)
+
+/home/user/PostMatchReport/Reporting/
+└─ report_generator.py               (ReportGenerator - orchestrates all)
+
+
+IMPORT SHORTCUT:
+
+    from Visual import (
+        PitchVisualizations,
+        StatisticalVisualizations,
+        HeatmapVisualizations,
+        AdvancedVisualizations,
+        TacticalVisualizer
+    )
+

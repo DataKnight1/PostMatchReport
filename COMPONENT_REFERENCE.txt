@@ -1,0 +1,293 @@
+╔════════════════════════════════════════════════════════════════════════════════════╗
+║                    POSTMATCHREPORT VISUALIZATION COMPONENTS                        ║
+║                            Complete Reference Guide                                 ║
+╚════════════════════════════════════════════════════════════════════════════════════╝
+
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│ 5 VISUALIZATION MODULES (located in /Visual/)                                    │
+└─────────────────────────────────────────────────────────────────────────────────┘
+
+1. PITCH_VISUALIZATIONS.PY
+   ├─ Class: PitchVisualizations
+   ├─ Methods:
+   │  ├─ create_shot_map()              [Pitch with shot markers]
+   │  ├─ create_xg_shot_map()           [★ Pitch with xG-colored shots + colorbar]
+   │  ├─ create_pass_network()          [★ Pitch with player positions + pass flows]
+   │  └─ create_pass_network_simple()   [Alternate simpler version]
+   │
+   └─ Features: VerticalPitch & Pitch objects from mplsoccer library
+                Team colors, markers, hexagon player nodes, line transparency
+
+
+2. STATISTICAL_VISUALIZATIONS.PY
+   ├─ Class: StatisticalVisualizations
+   ├─ Methods:
+   │  ├─ create_match_summary_panel()   [★ Score, stats table, bars, badges]
+   │  └─ create_stats_comparison_bars() [Simple horizontal bar chart]
+   │
+   └─ Features: Team logos/badges, stats tables with zebra-striping,
+                possession/xG bars, color-coded team info
+
+
+3. HEATMAP_VISUALIZATIONS.PY
+   ├─ Class: HeatmapVisualizations
+   ├─ Methods:
+   │  ├─ create_defensive_actions_heatmap() [★ Team-color tinted 2D heatmap]
+   │  ├─ create_touch_heatmap()            [★ YlOrRd heatmap of touches]
+   │  └─ create_pitch_control_map()        [★ Zonal dominance grid]
+   │
+   └─ Features: 2D histograms, Gaussian filtering, custom colormaps,
+                optional colorbars, territory visualization
+
+
+4. ADVANCED_VISUALIZATIONS.PY
+   ├─ Class: AdvancedVisualizations
+   ├─ Methods:
+   │  ├─ create_momentum_graph()        [★ Time-series momentum with goal markers]
+   │  ├─ create_cumulative_xg()         [★ Step chart cumulative xG over time]
+   │  ├─ create_zone14_map()            [★ Zone 14 + half-spaces pass viz]
+   │  └─ create_xg_timeline()           [Timeline of shots]
+   │
+   └─ Features: Weighted action scoring, Gaussian smoothing, heuristic xG,
+                time-based analysis, zone overlays
+
+
+5. TACTICAL_VISUALIZATIONS.PY
+   ├─ Class: TacticalVisualizer
+   ├─ Methods:
+   │  ├─ create_zonal_control_map()     [★ Grid-based territorial control]
+   │  └─ _draw_pitch_markings()         [Helper: draws pitch lines/arcs]
+   │
+   └─ Features: Configurable grid zones, pitch markings, color-coded zones,
+                minimalist design, legend, team attack directions
+
+
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│ 12 VISUALIZATIONS IN STANDARD REPORT (marked with ★ above are used)              │
+└─────────────────────────────────────────────────────────────────────────────────┘
+
+LAYOUT GRID (4 rows × 3 columns)
+
+ROW 1 - MATCH OVERVIEW
+├─ [0,0] Match Summary Panel              (StatisticalVisualizations)
+│        └─ Score, venue, team info, possession bar, xG bar, stats table
+│
+├─ [0,1] xG Shot Map                      (PitchVisualizations)
+│        └─ All shots color-coded by xG value, sized by xG
+│
+└─ [0,2] Momentum Graph                   (AdvancedVisualizations)
+         └─ Net momentum over 90 min with goal markers
+
+ROW 2 - ATTACKING PATTERNS
+├─ [1,0] Home Pass Network                (PitchVisualizations)
+│        └─ Players + connections, line width = pass volume
+│
+├─ [1,1] Cumulative xG                    (AdvancedVisualizations)
+│        └─ Step chart xG accumulation over time
+│
+└─ [1,2] Away Pass Network                (PitchVisualizations)
+         └─ Away team players + connections
+
+ROW 3 - TERRITORY CONTROL
+├─ [2,0] Home Zone 14 & Half-Spaces       (AdvancedVisualizations)
+│        └─ Passes in critical attacking zones (70m+)
+│
+├─ [2,1] Pitch Control Map                (HeatmapVisualizations)
+│        └─ 7×6 grid showing possession by region
+│
+└─ [2,2] Away Zone 14 & Half-Spaces       (AdvancedVisualizations)
+         └─ Away team zone 14 passes
+
+ROW 4 - DEFENSIVE ANALYSIS
+├─ [3,0] Home Defensive Actions           (HeatmapVisualizations)
+│        └─ Heatmap of tackles, blocks, interceptions
+│
+├─ [3,1] Zonal Control Map                (TacticalVisualizations)
+│        └─ 6×4 grid showing touch-based territorial control
+│
+└─ [3,2] Away Defensive Actions           (HeatmapVisualizations)
+         └─ Away team defensive actions heatmap
+
+
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│ DATA REQUIREMENTS BY VISUALIZATION                                               │
+└─────────────────────────────────────────────────────────────────────────────────┘
+
+PASS NETWORK
+│ Data Source: MatchProcessor.get_pass_network_data(team_id, min_passes=3)
+│ Returns: (avg_positions_df, pass_connections_df)
+│ Columns Required:
+│ ├─ Positions: x, y, name, shirt_no, count
+│ └─ Connections: x, y, x_end, y_end, pass_count
+
+SHOT MAP / CUMULATIVE XG
+│ Data Source: MatchProcessor.get_shots(team_id)
+│ Columns: x, y, xg, type_display, qualifiers_dict, cumulative_mins
+│ Optional: dist_to_goal, angle, outcome_display
+
+DEFENSIVE ACTIONS HEATMAP
+│ Data Source: MatchProcessor.get_defensive_actions(team_id)
+│ Columns: x, y (coordinates of tackles, blocks, etc.)
+
+MOMENTUM / PITCH CONTROL
+│ Data Source: MatchProcessor.get_events_dataframe()
+│ Columns: teamId, x, y, cumulative_mins, type_display, is_key_pass, xg
+
+ZONE 14 MAP
+│ Data Source: MatchProcessor.get_passes(team_id, successful_only=True)
+│ Columns: x, y, endX, endY
+
+MATCH SUMMARY PANEL
+│ Data Source: MatchProcessor.get_complete_match_summary()
+│ Structure: Dict with keys:
+│ ├─ teams (home/away with name, id)
+│ ├─ match_info (score, venue, date, competition)
+│ ├─ team_colors (home_color, away_color)
+│ ├─ team_logos (home, away paths)
+│ ├─ possession (home, away %)
+│ ├─ xg (home_xg, away_xg)
+│ ├─ shots_data (home_shots, away_shots)
+│ └─ team_stats (passing, shooting, defensive dicts)
+
+ZONAL CONTROL MAP
+│ Data Source: MatchProcessor.calculate_zonal_control(home_id, away_id, grid_cols, grid_rows)
+│ Returns: 2D numpy array of 'H', 'A', 'C' strings
+
+
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│ INITIALIZATION PARAMETERS                                                        │
+└─────────────────────────────────────────────────────────────────────────────────┘
+
+ReportGenerator.__init__()
+├─ cache_dir: str = "./cache"
+├─ theme: str = 'dark' or 'light'
+└─ show_colorbars: bool = True
+
+PitchVisualizations.__init__()
+├─ pitch_color: str = '#d6c39f' (light) or '#2b313a' (dark)
+└─ line_color: str = '#0e1117' (light) or '#d0d7de' (dark)
+
+HeatmapVisualizations.__init__()
+├─ pitch_color: str = '#d6c39f' or '#2b313a'
+├─ line_color: str = '#0e1117' or '#d0d7de'
+└─ show_colorbars: bool = True
+
+
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│ KEY METRICS & ALGORITHMS                                                        │
+└─────────────────────────────────────────────────────────────────────────────────┘
+
+MOMENTUM CALCULATION
+├─ Attacking action weighting:
+│  ├─ Final third pass: +1.0
+│  ├─ Box action: +1.0
+│  ├─ Key pass: +2.0
+│  └─ Shot: +5.0 + (5.0 × xG value)
+│
+├─ Time binning: 1-minute bins over 90 minutes
+├─ Net momentum = (home_weight - away_weight) / (home_weight + away_weight) × 100%
+└─ Smoothing: Gaussian filter (sigma=1.0)
+
+HEATMAP BINNING
+├─ Defensive/Touch maps: 21×14 grid (5m × ~4.86m cells)
+├─ Pitch Control map: 7×6 grid (15m × ~11.33m cells)
+└─ Smoothing: Gaussian filter (sigma varies by map type)
+
+HEURISTIC XG (when per-shot xG unavailable)
+├─ Base: 0.02
+├─ Penalty: 0.76
+├─ In box: +0.10
+├─ Final third: +0.05
+├─ Distance modifiers:
+│  ├─ <8m: +0.20
+│  ├─ <12m: +0.12
+│  ├─ <18m: +0.07
+│  └─ <25m: +0.03
+├─ Angle bonus: >0.35rad: +0.05, >0.25rad: +0.03
+├─ Head shot: ×0.7 multiplier
+├─ Outcome adjustments: SavedShot/Post: +0.03, Miss: -0.01
+└─ Range: clipped to [0.01, 0.95]
+
+
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│ CUSTOMIZATION OPTIONS FOR ENHANCED UI                                           │
+└─────────────────────────────────────────────────────────────────────────────────┘
+
+Per-Visualization Customizations:
+
+1. PASS NETWORK
+   ├─ MAX_LINE_WIDTH: 10 (configurable)
+   ├─ MAX_MARKER_SIZE: 3000 (configurable)
+   ├─ MIN_TRANSPARENCY: 0.3 (configurable)
+   └─ Marker shape: 'h' (hexagon) - could change to 'o', 's', etc.
+
+2. HEATMAP
+   ├─ Grid resolution: 21×14 standard, but customizable
+   ├─ Gaussian sigma: 1.0-1.5 (affects smoothness)
+   └─ Alpha transparency: 0.2-0.8 (affects blend)
+
+3. MOMENTUM
+   ├─ Action weights: All configurable in function
+   ├─ Gaussian smoothing: Could adjust sigma
+   └─ Timeline range: Currently fixed at 90 min
+
+4. ZONAL CONTROL
+   ├─ Grid dimensions: Configurable (currently 6×4)
+   └─ Zone colors: Customizable per team
+
+5. PITCH VISUALIZATIONS
+   ├─ Pitch colors: Dark/light mode built-in
+   └─ Marker sizes/styles: Customizable
+
+
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│ IMPLEMENTATION ROADMAP FOR SEPARATE DISPLAY                                     │
+└─────────────────────────────────────────────────────────────────────────────────┘
+
+Option A: Streamlit Dashboard
+├─ Create pages/tabs for each visualization category
+├─ Use st.columns() for responsive grid layout
+├─ Cache data generation with @st.cache_data
+└─ Add sidebar controls for customization
+
+Option B: Matplotlib Grid System
+├─ Use plt.GridSpec for flexible layouts
+├─ Allow users to select which visualizations to display
+├─ Generate report with dynamic grid based on selections
+└─ Export individual visualizations or combined reports
+
+Option C: Web Dashboard (React/Vue)
+├─ Render each visualization as separate SVG/PNG
+├─ Build interactive component library
+├─ Add comparison features (side-by-side teams)
+└─ Enable filtering/zooming per visualization
+
+Option D: Interactive Gallery
+├─ Create HTML page with clickable visualization cards
+├─ Use plotly for interactive versions
+├─ Add drill-down capabilities (click zone to zoom)
+└─ Export individual images
+
+
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│ FILE PATHS & IMPORTS                                                            │
+└─────────────────────────────────────────────────────────────────────────────────┘
+
+From ReportGenerator (Reporting/report_generator.py):
+
+from Visual.pitch_visualizations import PitchVisualizations
+from Visual.statistical_visualizations import StatisticalVisualizations
+from Visual.heatmap_visualizations import HeatmapVisualizations
+from Visual.advanced_visualizations import AdvancedVisualizations
+from Visual.tactical_visualizations import TacticalVisualizer
+from ETL.transformers.match_processor import MatchProcessor
+
+Usage Pattern:
+    1. Load data via DataLoader
+    2. Process with MatchProcessor
+    3. Extract specific data (shots, passes, events, etc.)
+    4. Instantiate visualization classes
+    5. Create matplotlib axes
+    6. Call visualization methods with data + axes
+    7. Display/save figure
+
