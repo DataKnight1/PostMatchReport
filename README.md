@@ -128,11 +128,14 @@ events_df.to_csv('events.csv')
 
 ## 📚 Documentation
 
-See full documentation for:
-- [Data Extraction](docs/extraction.md)
-- [Data Transformation](docs/transformation.md)
-- [Visualizations](docs/visualizations.md)
-- [API Reference](docs/api.md)
+See full documentation:
+- [Documentation Index](docs/DOCUMENTATION_INDEX.md)
+- [Exploration Summary](docs/EXPLORATION_SUMMARY.md)
+- [Visualization Guide](docs/VISUALIZATION_GUIDE.md)
+- [Component Reference](docs/COMPONENT_REFERENCE.txt)
+- [Quick Reference](docs/QUICK_REFERENCE.txt)
+- [Project Structure](docs/PROJECT_STRUCTURE.md)
+- [WhoScored ETL Guide](docs/WHOSCORED_ETL_GUIDE.md)
 
 ## 🏗️ Architecture Benefits
 
