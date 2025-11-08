@@ -614,6 +614,7 @@ def main():
             options=["Dark", "Light"],
             index=0,
             help="Choose the theme for visualizations"
+        )
         # Settings
         st.markdown("<h3 style='color: #e2e8f0;'>Settings</h3>", unsafe_allow_html=True)
 
@@ -647,7 +648,7 @@ def main():
         st.markdown("---")
 
         # Help
-        with st.expander("â„¹ï¸ How to find Match IDs"):
+        with st.expander("How to find Match IDs"):
             st.markdown("""
             **WhoScored:**
             - Go to whoscored.com
@@ -660,27 +661,6 @@ def main():
             - Copy ID from URL: `matches/{ID}/...`
             """)
 
-        with st.expander("ðŸ“Š What's available?"):
-            st.markdown("""
-            **Full Report:** Complete 12-panel match report with all visualizations
-
-            **Statistics:** Match summary with key stats, possession, xG, shots, etc.
-
-            **Shot Map:** All shots from both teams with xG values and outcomes
-
-            **Pass Network:** Team passing patterns showing player positions and connections
-
-            **Match Momentum:** Timeline showing match flow and team control
-
-            **xG Timeline:** Cumulative expected goals (xG) throughout the match
-
-            **Zone 14 & Half-Spaces:** Key attacking areas analysis for both teams
-
-            **Defensive Actions:** Heatmaps showing tackles, interceptions, and pressure
-
-            **Pitch Control:** Territory control map showing dominant areas
-
-            **Zonal Control:** Grid-based control analysis across the pitch
         with st.expander("ðŸ“‹ Visualizations Included"):
             st.markdown("""
             **12 Professional Visualizations:**
@@ -767,9 +747,8 @@ def main():
         }
 
         selected_viz_type = viz_type_map[viz_option]
-        theme = theme_option.lower()
 
-        spinner_text = "ðŸ”„ Generating visualization... This may take a few minutes..." if selected_viz_type != "full_report" else "ðŸ”„ Generating full match report... This may take a few minutes..."
+        spinner_text = ("Generating visualization... This may take a few minutes..." if selected_viz_type != "full_report" else "Generating full match report... This may take a few minutes...")
 
         with st.spinner(spinner_text):
             try:
@@ -779,8 +758,16 @@ def main():
                 if selected_viz_type == "full_report":
                     fig, match_summary = generate_report_cached(whoscored_id, fotmob_id_value, theme=theme)
                 else:
-                    fig, match_summary = generate_specific_visualization(whoscored_id, fotmob_id_value,
-                                                                         viz_type=selected_viz_type, theme=theme)
+                    fig, match_summary = generate_specific_visualization(
+                        whoscored_id,
+                        fotmob_id_value,
+                        viz_type=selected_viz_type,
+                        theme=theme,
+                    )
+            except Exception as e:
+                st.error(f"Error generating visualization: {e}")
+                st.exception(e)
+                return
     # Load match data
     if load_button or 'match_loaded' in st.session_state:
         if load_button:
@@ -788,7 +775,7 @@ def main():
                 st.error("âŒ Please enter a valid WhoScored Match ID")
                 return
 
-            with st.spinner("ðŸ”„ Loading match data..."):
+            with st.spinner("Loading match data..."):
                 try:
                     fotmob_id_value = fotmob_id if fotmob_id > 0 else None
                     whoscored_data, fotmob_data, processor, match_summary = load_match_data(
