@@ -261,8 +261,19 @@ def load_match_data(whoscored_id: int, fotmob_id: int = None, use_cache: bool = 
     whoscored_data, fotmob_data = generator.data_loader.load_all_data(
         whoscored_id, fotmob_id, use_cache=use_cache
     )
+
+    # Check if WhoScored data was successfully loaded
+    if not whoscored_data.get('match_centre', {}).get('success'):
+        error_msg = whoscored_data.get('match_centre', {}).get('error', 'Unknown error loading match data')
+        raise ValueError(f"Failed to load WhoScored data: {error_msg}")
+
     processor = MatchProcessor(whoscored_data, fotmob_data)
     match_summary = processor.get_complete_match_summary()
+
+    # Double-check match summary has required data
+    if not match_summary.get('success'):
+        raise ValueError("Match data processing failed")
+
     return whoscored_data, fotmob_data, processor, match_summary
 
 
@@ -621,38 +632,6 @@ def main():
 
         st.markdown("---")
 
-        # Visualization Type Selection
-        st.subheader("Visualization Type")
-
-        viz_option = st.radio(
-            "Select what to generate:",
-            options=[
-                "Full Report",
-                "Statistics",
-                "Shot Map",
-                "Pass Network",
-                "Match Momentum",
-                "xG Timeline",
-                "Zone 14 & Half-Spaces",
-                "Defensive Actions",
-                "Pitch Control",
-                "Zonal Control"
-            ],
-            index=0,
-            help="Choose the type of visualization to generate"
-        )
-
-        st.markdown("---")
-
-        # Options
-        st.subheader("Settings")
-
-        theme_option = st.selectbox(
-            "Theme",
-            options=["Dark", "Light"],
-            index=0,
-            help="Choose the theme for visualizations"
-        )
         # Settings
         st.markdown("<h3 style='color: #e2e8f0;'>Settings</h3>", unsafe_allow_html=True)
 
@@ -678,8 +657,6 @@ def main():
 
         st.markdown("---")
 
-        # Generate button
-        generate_button = st.button("Generate Visualization", type="primary")
         # Load Data Button
         load_button = st.button("Load Match Data", type="primary")
 
@@ -747,7 +724,7 @@ def main():
         with col1:
             st.markdown("""
             <div class="stats-card">
-                <h3>ðŸŽ¯ Shot Analysis</h3>
+                <h3>🎯 Shot Analysis</h3>
                 <p>All shots with xG values, outcomes, and field positions</p>
             </div>
             """, unsafe_allow_html=True)
@@ -755,7 +732,7 @@ def main():
         with col2:
             st.markdown("""
             <div class="stats-card">
-                <h3>ðŸ”— Pass Networks</h3>
+                <h3>🔗 Pass Networks</h3>
                 <p>Team passing patterns and player connections with average positions</p>
             </div>
             """, unsafe_allow_html=True)
@@ -763,54 +740,18 @@ def main():
         with col3:
             st.markdown("""
             <div class="stats-card">
-                <h3>ðŸ”¥ Heat Maps</h3>
+                <h3>🔥 Heat Maps</h3>
                 <p>Defensive pressure, pitch control, and territorial analysis</p>
             </div>
             """, unsafe_allow_html=True)
 
         return
 
-        # Map visualization options to internal keys
-        viz_type_map = {
-            "Full Report": "full_report",
-            "Statistics": "statistics",
-            "Shot Map": "shot_map",
-            "Pass Network": "pass_network",
-            "Match Momentum": "momentum",
-            "xG Timeline": "xg_timeline",
-            "Zone 14 & Half-Spaces": "zone14",
-            "Defensive Actions": "defensive_actions",
-            "Pitch Control": "pitch_control",
-            "Zonal Control": "zonal_control"
-        }
-
-        selected_viz_type = viz_type_map[viz_option]
-
-        spinner_text = ("Generating visualization... This may take a few minutes..." if selected_viz_type != "full_report" else "Generating full match report... This may take a few minutes...")
-
-        with st.spinner(spinner_text):
-            try:
-                # Generate report or specific visualization
-                fotmob_id_value = fotmob_id if fotmob_id > 0 else None
-
-                if selected_viz_type == "full_report":
-                    fig, match_summary = generate_report_cached(whoscored_id, fotmob_id_value, theme=theme)
-                else:
-                    fig, match_summary = generate_specific_visualization(
-                        whoscored_id,
-                        fotmob_id_value,
-                        viz_type=selected_viz_type,
-                        theme=theme,
-                    )
-            except Exception as e:
-                st.error(f"Error generating visualization: {e}")
-                st.exception(e)
-                return
     # Load match data
     if load_button or 'match_loaded' in st.session_state:
         if load_button:
             if whoscored_id < 1:
-                st.error("âŒ Please enter a valid WhoScored Match ID")
+                st.error("❌ Please enter a valid WhoScored Match ID")
                 return
 
             with st.spinner("Loading match data..."):
@@ -829,10 +770,10 @@ def main():
                     st.session_state['theme'] = theme
                     st.session_state['dpi'] = dpi_setting
 
-                    st.success("âœ… Match data loaded successfully!")
+                    st.success("✅ Match data loaded successfully!")
 
                 except Exception as e:
-                    st.error(f"âŒ Error loading match data: {str(e)}")
+                    st.error(f"❌ Error loading match data: {str(e)}")
                     st.exception(e)
                     return
 
@@ -841,6 +782,13 @@ def main():
         match_summary = st.session_state['match_summary']
         theme = st.session_state.get('theme', 'dark')
         dpi_setting = st.session_state.get('dpi', 150)
+
+        # Check if match data was successfully loaded
+        if not match_summary.get('success'):
+            st.error("❌ Failed to load match data. Please check the Match ID and try again.")
+            if 'match_loaded' in st.session_state:
+                del st.session_state['match_loaded']
+            return
 
         # Match info header
         home_name = match_summary['teams']['home']['name']
@@ -858,7 +806,7 @@ def main():
                 {home_name} <span style='font-weight: 900;'>{home_score} - {away_score}</span> {away_name}
             </h2>
             <p style='text-align: center; font-size: 1.3rem;'>
-                <strong>{league}</strong> â€¢ {date} â€¢ {venue}
+                <strong>{league}</strong> • {date} • {venue}
             </p>
         </div>
         """, unsafe_allow_html=True)
@@ -1027,9 +975,8 @@ def main():
                             st.session_state['complete_report'] = fig
                             st.success("Complete report generated!")
                         except Exception as e:
-                            st.error(f"âŒ Error generating report: {str(e)}")
+                            st.error(f"❌ Error generating report: {str(e)}")
                             st.exception(e)
-                            st.error(f"Error generating report: {str(e)}")
 
                 if 'complete_report' in st.session_state:
                     fig = st.session_state['complete_report']
@@ -1143,9 +1090,7 @@ def main():
                     st.info(f"**Match:** {home_name} vs {away_name}")
 
             else:
-                st.info("ðŸ‘† Generate the complete report first in the 'Complete Report' tab to enable download options")
-                st.info("Generate the complete report first in the 'Complete Report' tab to enable download options")
-                st.info("Generate the complete report first in the 'Complete Report' tab to enable download options")
+                st.info("👆 Generate the complete report first in the 'Complete Report' tab to enable download options")
     # Footer
     st.markdown("---")
     st.markdown("""
