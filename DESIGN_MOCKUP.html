@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PostMatchReport - Black & White Design Mockup</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: #ffffff;
+            color: #000000;
+            line-height: 1.6;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 320px;
+            background-color: #fafafa;
+            border-right: 1px solid #e0e0e0;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            letter-spacing: -0.02em;
+        }
+
+        .divider {
+            border: none;
+            border-top: 1px solid #e0e0e0;
+            margin: 1.5rem 0;
+        }
+
+        .section-title {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #666666;
+            margin-bottom: 1rem;
+        }
+
+        .input-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .input-label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #333333;
+            margin-bottom: 0.5rem;
+        }
+
+        input[type="number"],
+        select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #e0e0e0;
+            background-color: #ffffff;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+
+        input[type="number"]:focus,
+        select:focus {
+            outline: none;
+            border-color: #000000;
+            box-shadow: 0 0 0 1px #000000;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        input[type="checkbox"] {
+            margin-right: 0.5rem;
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 1rem;
+            background-color: #000000;
+            color: #ffffff;
+            border: none;
+            font-weight: 600;
+            font-size: 0.875rem;
+            letter-spacing: 0.02em;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary:hover {
+            background-color: #333333;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .help-section {
+            margin-top: auto;
+            padding-top: 2rem;
+        }
+
+        .help-link {
+            display: block;
+            padding: 0.5rem 0;
+            color: #666666;
+            text-decoration: none;
+            font-size: 0.875rem;
+            transition: color 0.2s;
+        }
+
+        .help-link:hover {
+            color: #000000;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            padding: 3rem;
+        }
+
+        .header {
+            margin-bottom: 3rem;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            color: #666666;
+            font-size: 1.125rem;
+        }
+
+        .match-card {
+            background-color: #fafafa;
+            border: 1px solid #e0e0e0;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+
+        .match-score {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .match-meta {
+            color: #666666;
+            font-size: 0.875rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .stat-box {
+            text-align: center;
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #666666;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #000000;
+        }
+
+        .report-section {
+            margin-top: 3rem;
+        }
+
+        .section-heading {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .report-image {
+            width: 100%;
+            border: 1px solid #e0e0e0;
+            margin: 2rem 0;
+        }
+
+        .btn-secondary {
+            padding: 0.75rem 1.5rem;
+            background-color: #ffffff;
+            color: #000000;
+            border: 1px solid #000000;
+            font-weight: 600;
+            font-size: 0.875rem;
+            letter-spacing: 0.02em;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-secondary:hover {
+            background-color: #000000;
+            color: #ffffff;
+        }
+
+        .footer {
+            text-align: center;
+            color: #999999;
+            font-size: 0.875rem;
+            padding: 2rem 0;
+            border-top: 1px solid #e0e0e0;
+            margin-top: 4rem;
+        }
+
+        /* Visualization Preview */
+        .viz-preview {
+            background-color: #fafafa;
+            border: 1px solid #e0e0e0;
+            padding: 2rem;
+            min-height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #999999;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">PostMatchReport</div>
+
+            <hr class="divider">
+
+            <div class="section-title">Match Selection</div>
+
+            <div class="input-group">
+                <label class="input-label">WhoScored Match ID</label>
+                <input type="number" value="1821302" placeholder="Enter match ID">
+            </div>
+
+            <div class="input-group">
+                <label class="input-label">FotMob Match ID (Optional)</label>
+                <input type="number" value="3900958" placeholder="Enter match ID">
+            </div>
+
+            <hr class="divider">
+
+            <div class="section-title">Settings</div>
+
+            <div class="input-group">
+                <label class="input-label">Report Quality</label>
+                <select>
+                    <option>Low (80 DPI)</option>
+                    <option selected>Medium (100 DPI)</option>
+                    <option>High (150 DPI)</option>
+                    <option>Very High (200 DPI)</option>
+                    <option>Print (300 DPI)</option>
+                </select>
+            </div>
+
+            <div class="checkbox-group">
+                <input type="checkbox" id="cache" checked>
+                <label for="cache" class="input-label" style="margin-bottom: 0;">Use Cached Data</label>
+            </div>
+
+            <hr class="divider">
+
+            <button class="btn-primary">GENERATE REPORT</button>
+
+            <div class="help-section">
+                <a href="#" class="help-link">Help & Documentation</a>
+                <a href="#" class="help-link">About PostMatchReport</a>
+                <a href="#" class="help-link">Data Sources</a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="header">
+                <h1>PostMatchReport</h1>
+                <p class="subtitle">Comprehensive football match analytics in black & white</p>
+            </header>
+
+            <div class="match-card">
+                <div class="match-score">Liverpool 2 – 2 Manchester United</div>
+                <div class="match-meta">
+                    <strong>Premier League</strong> • 5 January 2025 • Anfield
+                </div>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <div class="stat-label">Possession</div>
+                    <div class="stat-value">64% – 36%</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Expected Goals</div>
+                    <div class="stat-value">1.8 – 1.2</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Shots</div>
+                    <div class="stat-value">15 – 8</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">On Target</div>
+                    <div class="stat-value">6 – 4</div>
+                </div>
+            </div>
+
+            <section class="report-section">
+                <h2 class="section-heading">Match Report</h2>
+
+                <div class="viz-preview">
+                    <div style="text-align: center;">
+                        <div style="font-size: 4rem; margin-bottom: 1rem;">⚽</div>
+                        <div style="font-size: 1.125rem; color: #000000;">
+                            Black & White Visualization Grid<br>
+                            <span style="font-size: 0.875rem; color: #666666;">
+                                12 monochrome visualizations using patterns and shapes<br>
+                                No colors • High contrast • Print-friendly
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 2rem;">
+                    <button class="btn-secondary">DOWNLOAD REPORT</button>
+                </div>
+            </section>
+
+            <section class="report-section">
+                <h2 class="section-heading">Visualization Types</h2>
+
+                <div class="stats-grid">
+                    <div class="stat-box" style="text-align: left;">
+                        <div class="stat-label">Shot Map</div>
+                        <div style="font-size: 0.875rem; color: #666666; margin-top: 0.5rem;">
+                            ● Goals (filled circles)<br>
+                            ○ On target (hollow)<br>
+                            × Missed (crosses)
+                        </div>
+                    </div>
+                    <div class="stat-box" style="text-align: left;">
+                        <div class="stat-label">Pass Network</div>
+                        <div style="font-size: 0.875rem; color: #666666; margin-top: 0.5rem;">
+                            ─── Home (solid)<br>
+                            ┈┈┈ Away (dashed)<br>
+                            Line weight = volume
+                        </div>
+                    </div>
+                    <div class="stat-box" style="text-align: left;">
+                        <div class="stat-label">Heatmaps</div>
+                        <div style="font-size: 0.875rem; color: #666666; margin-top: 0.5rem;">
+                            White → Gray → Black<br>
+                            Grayscale intensity<br>
+                            No colorbar needed
+                        </div>
+                    </div>
+                    <div class="stat-box" style="text-align: left;">
+                        <div class="stat-label">Patterns</div>
+                        <div style="font-size: 0.875rem; color: #666666; margin-top: 0.5rem;">
+                            /// Diagonal lines<br>
+                            ... Dot patterns<br>
+                            Clear differentiation
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <footer class="footer">
+                PostMatchReport • Advanced Football Analytics<br>
+                Data from WhoScored & FotMob
+            </footer>
+        </main>
+    </div>
+</body>
+</html>
