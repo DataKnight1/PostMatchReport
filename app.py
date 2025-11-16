@@ -19,6 +19,7 @@ from Visual.statistical_visualizations import StatisticalVisualizations
 from Visual.heatmap_visualizations import HeatmapVisualizations
 from Visual.advanced_visualizations import AdvancedVisualizations
 from Visual.tactical_visualizations import TacticalVisualizer
+from utils.match_database_manager import MatchDatabaseManager
 
 
 # Page configuration
@@ -547,22 +548,90 @@ def main():
         st.markdown("</div>", unsafe_allow_html=True)
         st.markdown("---")
 
-        # Match IDs
-        st.markdown("<h3 style='color: #e2e8f0;'>Match IDs</h3>", unsafe_allow_html=True)
+        # Match Selection
+        st.markdown("<h3 style='color: #e2e8f0;'>Match Selection</h3>", unsafe_allow_html=True)
 
-        whoscored_id = st.number_input(
-            "WhoScored Match ID",
-            min_value=1,
-            value=1821302,
-            help="Enter the WhoScored match ID from the URL"
-        )
+        # Initialize match database manager
+        try:
+            db_manager = MatchDatabaseManager()
+            db_stats = db_manager.get_database_stats()
 
-        fotmob_id = st.number_input(
-            "FotMob Match ID (Optional)",
-            min_value=0,
-            value=3900958,
-            help="Enter the FotMob match ID for enhanced stats"
-        )
+            # Selection mode toggle
+            use_dropdown = st.checkbox(
+                "Use Match Database",
+                value=True,
+                help=f"Browse {db_stats['total_matches']} matches across {db_stats['total_leagues']} leagues"
+            )
+
+            if use_dropdown:
+                # Dropdown selection mode
+                league_names = db_manager.get_league_names()
+
+                if league_names:
+                    # League selection
+                    selected_league = st.selectbox(
+                        "Select League",
+                        options=league_names,
+                        help="Choose a league to view available matches"
+                    )
+
+                    # Match selection within league
+                    match_displays = db_manager.get_match_display_names(selected_league)
+
+                    if match_displays:
+                        selected_match = st.selectbox(
+                            "Select Match",
+                            options=match_displays,
+                            help="Choose a match to analyze"
+                        )
+
+                        # Get match IDs
+                        whoscored_id, fotmob_id = db_manager.get_match_ids(selected_league, selected_match)
+
+                        # Display selected match info
+                        st.success(f"✓ Match selected from {selected_league}")
+                        st.caption(f"WhoScored ID: {whoscored_id}")
+                        st.caption(f"FotMob ID: {fotmob_id}")
+                    else:
+                        st.warning("No matches available in this league")
+                        whoscored_id = 1821302
+                        fotmob_id = 3900958
+                else:
+                    st.error("No leagues found in database")
+                    whoscored_id = 1821302
+                    fotmob_id = 3900958
+            else:
+                # Manual input mode
+                whoscored_id = st.number_input(
+                    "WhoScored Match ID",
+                    min_value=1,
+                    value=1821302,
+                    help="Enter the WhoScored match ID from the URL"
+                )
+
+                fotmob_id = st.number_input(
+                    "FotMob Match ID (Optional)",
+                    min_value=0,
+                    value=3900958,
+                    help="Enter the FotMob match ID for enhanced stats"
+                )
+
+        except Exception as e:
+            st.error(f"Error loading match database: {str(e)}")
+            # Fallback to manual input
+            whoscored_id = st.number_input(
+                "WhoScored Match ID",
+                min_value=1,
+                value=1821302,
+                help="Enter the WhoScored match ID from the URL"
+            )
+
+            fotmob_id = st.number_input(
+                "FotMob Match ID (Optional)",
+                min_value=0,
+                value=3900958,
+                help="Enter the FotMob match ID for enhanced stats"
+            )
 
         st.markdown("---")
 
@@ -597,17 +666,21 @@ def main():
         st.markdown("---")
 
         # Help
-        with st.expander("How to find Match IDs"):
+        with st.expander("Match Selection Guide"):
             st.markdown("""
-            **WhoScored:**
-            - Go to whoscored.com
-            - Navigate to a match page
-            - Copy ID from URL: `Matches/{ID}/...`
+            **Using Match Database (Recommended):**
+            - Check "Use Match Database"
+            - Select a league from the dropdown
+            - Choose a match from the available games
+            - IDs are automatically populated
 
-            **FotMob:**
-            - Go to fotmob.com
-            - Navigate to a match page
-            - Copy ID from URL: `matches/{ID}/...`
+            **Manual Input:**
+            - Uncheck "Use Match Database"
+            - Enter WhoScored and FotMob IDs manually
+
+            **Finding Match IDs:**
+            - **WhoScored**: URL format `Matches/{ID}/...`
+            - **FotMob**: URL format `matches/{ID}/...`
             """)
 
         with st.expander("Visualizations Included"):

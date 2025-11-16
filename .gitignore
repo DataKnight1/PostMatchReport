@@ -39,6 +39,7 @@ ENV/
 *.json
 *.csv
 !super_lig_match_program.csv
+!data/match_database.json
 
 # OS
 .DS_Store
@@ -57,6 +58,7 @@ cache/
 
 # Temporary files
 _*.py
+!**/__init__.py
 _*.txt
 tmp_*.py
 tmp_*.txt
