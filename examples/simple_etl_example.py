@@ -26,7 +26,7 @@ def main():
     # ===== STEP 1: EXTRACT =====
     print("\n[1/3] Extracting data from WhoScored...")
 
-    extractor = WhoScoredExtractor(headless=True)
+    extractor = WhoScoredExtractor(headless=True, browser_type="chromium")
     data = extractor.extract_all_sections(match_id)
 
     if not data.get('match_centre', {}).get('success'):

@@ -39,7 +39,7 @@ PostMatchReport/
 ```bash
 # Install
 pip install -r requirements.txt
-playwright install firefox
+playwright install chromium
 
 # Generate report (CLI)
 python main.py 1716104 --fotmob-id 4193558

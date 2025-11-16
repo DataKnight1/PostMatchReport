@@ -33,7 +33,7 @@ This ETL pipeline automatically extracts match data from WhoScored, processes ev
 pip install -r requirements.txt
 
 # Install Playwright browsers
-python -m playwright install firefox
+python -m playwright install chromium
 ```
 
 ### Basic Usage
