@@ -29,226 +29,160 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Enhanced Custom CSS with modern design
+# Custom CSS - Black & White Minimalist Design
 st.markdown("""
     <style>
-    /* Main background and theme */
+    /* Global Styles */
     .main {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        background-attachment: fixed;
+        background-color: #ffffff;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     }
 
-    .block-container {
-        padding: 2rem 3rem;
-        background-color: rgba(255, 255, 255, 0.95);
-        border-radius: 20px;
-        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-        margin: 2rem auto;
-    }
-
-    /* Headers */
+    /* Typography */
     h1 {
-        color: #1a1a2e;
-        font-weight: 800;
-        text-align: center;
-        font-size: 3rem !important;
-        margin-bottom: 1rem;
-        text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
+        color: #000000;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        margin-bottom: 0.5em;
     }
 
     h2 {
-        color: #2d3748;
-        font-weight: 700;
-        margin-top: 2rem;
-        font-size: 2rem !important;
+        color: #000000;
+        font-weight: 600;
+        letter-spacing: -0.01em;
+        margin-top: 2em;
+        margin-bottom: 0.5em;
+        border-bottom: 1px solid #e0e0e0;
+        padding-bottom: 0.3em;
     }
 
     h3 {
-        color: #4a5568;
+        color: #333333;
         font-weight: 600;
-        font-size: 1.5rem !important;
+        margin-top: 1.5em;
+    }
+
+    p {
+        color: #666666;
+        line-height: 1.6;
+    }
+
+    /* Sidebar */
+    [data-testid="stSidebar"] {
+        background-color: #fafafa;
+        border-right: 1px solid #e0e0e0;
+    }
+
+    [data-testid="stSidebar"] h1 {
+        font-size: 1.5rem;
+        margin-bottom: 2rem;
+        color: #000000;
     }
 
     /* Buttons */
     .stButton>button {
         width: 100%;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        font-weight: 700;
-        font-size: 1.1rem;
-        padding: 0.75rem 2rem;
-        border-radius: 12px;
+        background-color: #000000;
+        color: #ffffff;
         border: none;
-        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
-        transition: all 0.3s ease;
-        text-transform: uppercase;
-        letter-spacing: 1px;
+        padding: 0.75rem 1.5rem;
+        font-weight: 600;
+        letter-spacing: 0.02em;
+        transition: all 0.2s;
+        border-radius: 4px;
     }
 
     .stButton>button:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 25px rgba(102, 126, 234, 0.6);
+        background-color: #333333;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     }
 
-    /* Cards for components */
-    .component-card {
-        background: white;
-        padding: 2rem;
-        border-radius: 16px;
-        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
-        margin: 1.5rem 0;
-        border: 2px solid transparent;
-        transition: all 0.3s ease;
+    /* Inputs */
+    .stNumberInput input,
+    .stTextInput input,
+    .stSelectbox select {
+        border: 1px solid #e0e0e0;
+        border-radius: 4px;
+        padding: 0.5rem;
+        background-color: #ffffff;
     }
 
-    .component-card:hover {
-        border-color: #667eea;
-        box-shadow: 0 12px 40px rgba(102, 126, 234, 0.2);
-        transform: translateY(-4px);
+    .stNumberInput input:focus,
+    .stTextInput input:focus,
+    .stSelectbox select:focus {
+        border-color: #000000;
+        box-shadow: 0 0 0 1px #000000;
+        outline: none;
     }
 
-    /* Match info panel */
+    /* Checkbox */
+    .stCheckbox {
+        color: #333333;
+    }
+
+    /* Cards/Panels */
     .match-info {
-        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-        padding: 2.5rem;
-        border-radius: 20px;
-        margin: 1.5rem 0;
-        box-shadow: 0 10px 40px rgba(245, 87, 108, 0.3);
-        color: white;
-    }
-
-    .match-info h2, .match-info h3 {
-        color: white !important;
-        text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
-    }
-
-    /* Stats card */
-    .stats-card {
-        background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
-        padding: 1.5rem;
-        border-radius: 16px;
-        text-align: center;
-        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
-        margin: 0.5rem 0;
+        background-color: #fafafa;
+        border: 1px solid #e0e0e0;
+        padding: 2rem;
+        margin: 2rem 0;
+        border-radius: 4px;
     }
 
     /* Metrics */
-    .stMetric {
-        background: white;
-        padding: 1.5rem;
-        border-radius: 12px;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    [data-testid="stMetricValue"] {
+        color: #000000;
+        font-weight: 700;
     }
 
-    /* Tabs */
-    .stTabs [data-baseweb="tab-list"] {
-        gap: 8px;
-        background-color: #f7fafc;
-        border-radius: 12px;
-        padding: 0.5rem;
+    [data-testid="stMetricLabel"] {
+        color: #666666;
+        font-weight: 500;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 0.05em;
     }
 
-    .stTabs [data-baseweb="tab"] {
-        height: 60px;
-        border-radius: 10px;
-        color: #4a5568;
-        font-weight: 600;
-        font-size: 1.1rem;
-        padding: 0 2rem;
-    }
-
-    .stTabs [aria-selected="true"] {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-    }
-
-    /* Sidebar */
-    .css-1d391kg, [data-testid="stSidebar"] {
-        background: linear-gradient(180deg, #2d3748 0%, #1a202c 100%);
-    }
-
-    .css-1d391kg .sidebar-content, [data-testid="stSidebar"] .sidebar-content {
-        color: white;
-    }
-
-    /* Input fields */
-    .stNumberInput input {
-        border-radius: 8px;
-        border: 2px solid #e2e8f0;
-        padding: 0.5rem;
-    }
-
-    .stNumberInput input:focus {
-        border-color: #667eea;
-        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-    }
-
-    /* Success/Error messages */
-    .stSuccess {
-        background-color: #c6f6d5;
-        border-radius: 12px;
-        padding: 1rem;
-    }
-
-    .stError {
-        background-color: #fed7d7;
-        border-radius: 12px;
-        padding: 1rem;
-    }
-
-    /* Info boxes */
-    .stInfo {
-        background: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%);
-        border-radius: 12px;
+    /* Dividers */
+    hr {
         border: none;
-    }
-
-    /* Download button special styling */
-    .download-section {
-        background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
-        padding: 2rem;
-        border-radius: 16px;
-        text-align: center;
+        border-top: 1px solid #e0e0e0;
         margin: 2rem 0;
     }
 
-    /* Component title badges */
-    .component-badge {
-        display: inline-block;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        padding: 0.5rem 1.5rem;
-        border-radius: 25px;
-        font-weight: 700;
-        font-size: 0.9rem;
-        margin-bottom: 1rem;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-    }
-
-    /* Footer */
-    .footer {
-        text-align: center;
-        color: #718096;
-        padding: 2rem;
-        border-top: 2px solid #e2e8f0;
-        margin-top: 3rem;
-    }
-
-    /* Loading animation */
-    .stSpinner > div {
-        border-top-color: #667eea !important;
-    }
-
-    /* Expander */
+    /* Expanders */
     .streamlit-expanderHeader {
-        background-color: #f7fafc;
-        border-radius: 8px;
+        background-color: #fafafa;
+        border: 1px solid #e0e0e0;
+        color: #000000;
         font-weight: 600;
+        border-radius: 4px;
+    }
+
+    .streamlit-expanderHeader:hover {
+        background-color: #f5f5f5;
+    }
+
+    /* Info boxes */
+    .stAlert {
+        background-color: #fafafa;
+        border: 1px solid #e0e0e0;
+        color: #333333;
+        border-radius: 4px;
+    }
+
+    /* Download button */
+    .stDownloadButton>button {
+        background-color: #ffffff;
+        color: #000000;
+        border: 1px solid #000000;
+        font-weight: 600;
+    }
+
+    .stDownloadButton>button:hover {
+        background-color: #000000;
+        color: #ffffff;
     }
     </style>
     """, unsafe_allow_html=True)
@@ -632,12 +566,12 @@ def main():
 
         st.markdown("---")
 
-        # Settings
-        st.markdown("<h3 style='color: #e2e8f0;'>Settings</h3>", unsafe_allow_html=True)
+        # Options
+        st.subheader("Options")
 
         theme = st.selectbox(
-            "Theme",
-            options=['dark', 'light'],
+            "Report Theme",
+            options=["dark", "light"],
             index=0,
             help="Choose visualization theme"
         )
@@ -802,10 +736,10 @@ def main():
 
         st.markdown(f"""
         <div class="match-info">
-            <h2 style='text-align: center; font-size: 2.5rem; margin-bottom: 1rem;'>
+            <h2 style='text-align: center;'>
                 {home_name} <span style='font-weight: 900;'>{home_score} - {away_score}</span> {away_name}
             </h2>
-            <p style='text-align: center; font-size: 1.3rem;'>
+            <p style='text-align: center;'>
                 <strong>{league}</strong> • {date} • {venue}
             </p>
         </div>
