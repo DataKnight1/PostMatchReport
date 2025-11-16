@@ -80,6 +80,17 @@ st.markdown("""
         color: #e6edf3;
     }
 
+    [data-testid="stSidebar"] h2,
+    [data-testid="stSidebar"] h3 {
+        color: #e6edf3;
+    }
+
+    [data-testid="stSidebar"] p,
+    [data-testid="stSidebar"] label,
+    [data-testid="stSidebar"] div {
+        color: #9aa6b2;
+    }
+
     /* Buttons - Light on Dark */
     .stButton>button {
         width: 100%;
@@ -191,9 +202,9 @@ st.markdown("""
 
 
 @st.cache_data(ttl=3600)
-def load_match_data(whoscored_id: int, fotmob_id: int = None, use_cache: bool = True):
+def load_match_data(whoscored_id: int, fotmob_id: int = None, use_cache: bool = True, theme: str = 'dark'):
     """Load and process match data with caching."""
-    generator = ReportGenerator(cache_dir="./cache", theme='dark')
+    generator = ReportGenerator(cache_dir="./cache", theme=theme)
     whoscored_data, fotmob_data = generator.data_loader.load_all_data(
         whoscored_id, fotmob_id, use_cache=use_cache
     )
@@ -694,7 +705,7 @@ def main():
                 try:
                     fotmob_id_value = fotmob_id if fotmob_id > 0 else None
                     whoscored_data, fotmob_data, processor, match_summary = load_match_data(
-                        whoscored_id, fotmob_id_value, use_cache
+                        whoscored_id, fotmob_id_value, use_cache, theme
                     )
 
                     # Store in session state
