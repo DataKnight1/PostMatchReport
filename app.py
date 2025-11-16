@@ -203,7 +203,7 @@ st.markdown("""
 
 
 @st.cache_data(ttl=3600)
-def load_match_data(whoscored_id: int, fotmob_id: int = None, use_cache: bool = True, theme: str = 'dark'):
+def load_match_data(whoscored_id: int, fotmob_id: int | None = None, use_cache: bool = True, theme: str = 'dark'):
     """Load and process match data with caching."""
     generator = ReportGenerator(cache_dir="./cache", theme=theme)
     whoscored_data, fotmob_data = generator.data_loader.load_all_data(
@@ -226,7 +226,7 @@ def load_match_data(whoscored_id: int, fotmob_id: int = None, use_cache: bool = 
 
 
 @st.cache_data(ttl=3600)
-def generate_complete_report(whoscored_id: int, fotmob_id: int = None, theme: str = 'dark', dpi: int = 100):
+def generate_complete_report(whoscored_id: int, fotmob_id: int | None = None, theme: str = 'dark', dpi: int = 100):
     """Generate complete report with all visualizations."""
     generator = ReportGenerator(cache_dir="./cache", theme=theme)
     fig = generator.generate_report(
@@ -585,6 +585,7 @@ def main():
                     selected_league = st.selectbox(
                         "Select League",
                         options=league_names,
+                        key="league_selector",
                         help="Choose a league to view available matches"
                     )
 
@@ -595,6 +596,7 @@ def main():
                         selected_match = st.selectbox(
                             "Select Match",
                             options=match_displays,
+                            key="match_selector",
                             help="Choose a match to analyze"
                         )
 
@@ -768,6 +770,19 @@ def main():
         return
 
     # Load match data
+    # Check if session state data matches currently selected match
+    fotmob_id_value = fotmob_id if fotmob_id > 0 else None
+    match_ids_changed = (
+        'whoscored_id' in st.session_state and
+        (st.session_state['whoscored_id'] != whoscored_id or
+         st.session_state.get('fotmob_id') != fotmob_id_value)
+    )
+
+    # Clear stale session state if match IDs changed
+    if match_ids_changed:
+        if 'match_loaded' in st.session_state:
+            del st.session_state['match_loaded']
+
     if load_button or 'match_loaded' in st.session_state:
         if load_button:
             if whoscored_id < 1:
@@ -776,7 +791,6 @@ def main():
 
             with st.spinner("Loading match data..."):
                 try:
-                    fotmob_id_value = fotmob_id if fotmob_id > 0 else None
                     whoscored_data, fotmob_data, processor, match_summary = load_match_data(
                         whoscored_id, fotmob_id_value, use_cache, theme
                     )
