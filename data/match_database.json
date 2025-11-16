@@ -34,6 +34,76 @@
           "whoscored_id": 1821304,
           "fotmob_id": 3900960,
           "display": "Manchester United 1-1 Tottenham (2024-04-07)"
+        },
+        {
+          "id": "pl-004",
+          "home_team": "Arsenal",
+          "away_team": "Manchester City",
+          "date": "2024-09-22",
+          "score": "2-2",
+          "whoscored_id": 1821329,
+          "fotmob_id": 3900985,
+          "display": "Arsenal 2-2 Manchester City (2024-09-22)"
+        },
+        {
+          "id": "pl-005",
+          "home_team": "Liverpool",
+          "away_team": "Manchester United",
+          "date": "2024-09-01",
+          "score": "3-0",
+          "whoscored_id": 1821330,
+          "fotmob_id": 3900986,
+          "display": "Liverpool 3-0 Manchester United (2024-09-01)"
+        },
+        {
+          "id": "pl-006",
+          "home_team": "Tottenham",
+          "away_team": "Arsenal",
+          "date": "2024-09-15",
+          "score": "1-0",
+          "whoscored_id": 1821331,
+          "fotmob_id": 3900987,
+          "display": "Tottenham 1-0 Arsenal (2024-09-15)"
+        },
+        {
+          "id": "pl-007",
+          "home_team": "Chelsea",
+          "away_team": "Manchester City",
+          "date": "2024-08-18",
+          "score": "0-2",
+          "whoscored_id": 1821332,
+          "fotmob_id": 3900988,
+          "display": "Chelsea 0-2 Manchester City (2024-08-18)"
+        },
+        {
+          "id": "pl-008",
+          "home_team": "Newcastle",
+          "away_team": "Liverpool",
+          "date": "2024-08-25",
+          "score": "1-2",
+          "whoscored_id": 1821333,
+          "fotmob_id": 3900989,
+          "display": "Newcastle 1-2 Liverpool (2024-08-25)"
+        },
+        {
+          "id": "pl-009",
+          "home_team": "Brighton",
+          "away_team": "Tottenham",
+          "date": "2024-10-06",
+          "score": "3-2",
+          "whoscored_id": 1821334,
+          "fotmob_id": 3900990,
+          "display": "Brighton 3-2 Tottenham (2024-10-06)"
+        },
+        {
+          "id": "pl-010",
+          "home_team": "Aston Villa",
+          "away_team": "Arsenal",
+          "date": "2024-08-24",
+          "score": "0-2",
+          "whoscored_id": 1821335,
+          "fotmob_id": 3900991,
+          "display": "Aston Villa 0-2 Arsenal (2024-08-24)"
         }
       ]
     },
@@ -61,6 +131,66 @@
           "whoscored_id": 1821306,
           "fotmob_id": 3900962,
           "display": "Atletico Madrid 2-0 Sevilla (2024-04-28)"
+        },
+        {
+          "id": "ll-003",
+          "home_team": "Barcelona",
+          "away_team": "Real Madrid",
+          "date": "2024-10-26",
+          "score": "4-0",
+          "whoscored_id": 1821336,
+          "fotmob_id": 3900992,
+          "display": "Barcelona 4-0 Real Madrid (2024-10-26)"
+        },
+        {
+          "id": "ll-004",
+          "home_team": "Real Madrid",
+          "away_team": "Atletico Madrid",
+          "date": "2024-09-29",
+          "score": "1-1",
+          "whoscored_id": 1821337,
+          "fotmob_id": 3900993,
+          "display": "Real Madrid 1-1 Atletico Madrid (2024-09-29)"
+        },
+        {
+          "id": "ll-005",
+          "home_team": "Barcelona",
+          "away_team": "Atletico Madrid",
+          "date": "2024-03-03",
+          "score": "3-0",
+          "whoscored_id": 1821338,
+          "fotmob_id": 3900994,
+          "display": "Barcelona 3-0 Atletico Madrid (2024-03-03)"
+        },
+        {
+          "id": "ll-006",
+          "home_team": "Athletic Bilbao",
+          "away_team": "Barcelona",
+          "date": "2024-08-24",
+          "score": "1-2",
+          "whoscored_id": 1821339,
+          "fotmob_id": 3900995,
+          "display": "Athletic Bilbao 1-2 Barcelona (2024-08-24)"
+        },
+        {
+          "id": "ll-007",
+          "home_team": "Sevilla",
+          "away_team": "Real Madrid",
+          "date": "2024-10-20",
+          "score": "0-1",
+          "whoscored_id": 1821340,
+          "fotmob_id": 3900996,
+          "display": "Sevilla 0-1 Real Madrid (2024-10-20)"
+        },
+        {
+          "id": "ll-008",
+          "home_team": "Real Sociedad",
+          "away_team": "Barcelona",
+          "date": "2024-11-10",
+          "score": "0-1",
+          "whoscored_id": 1821341,
+          "fotmob_id": 3900997,
+          "display": "Real Sociedad 0-1 Barcelona (2024-11-10)"
         }
       ]
     },
@@ -88,6 +218,66 @@
           "whoscored_id": 1821308,
           "fotmob_id": 3900964,
           "display": "Juventus 2-1 Napoli (2024-04-29)"
+        },
+        {
+          "id": "sa-003",
+          "home_team": "AC Milan",
+          "away_team": "Inter Milan",
+          "date": "2024-09-22",
+          "score": "1-2",
+          "whoscored_id": 1821342,
+          "fotmob_id": 3900998,
+          "display": "AC Milan 1-2 Inter Milan (2024-09-22)"
+        },
+        {
+          "id": "sa-004",
+          "home_team": "Napoli",
+          "away_team": "Juventus",
+          "date": "2024-09-21",
+          "score": "0-0",
+          "whoscored_id": 1821343,
+          "fotmob_id": 3900999,
+          "display": "Napoli 0-0 Juventus (2024-09-21)"
+        },
+        {
+          "id": "sa-005",
+          "home_team": "Roma",
+          "away_team": "Inter Milan",
+          "date": "2024-10-20",
+          "score": "0-1",
+          "whoscored_id": 1821344,
+          "fotmob_id": 3901000,
+          "display": "Roma 0-1 Inter Milan (2024-10-20)"
+        },
+        {
+          "id": "sa-006",
+          "home_team": "Inter Milan",
+          "away_team": "Juventus",
+          "date": "2024-10-27",
+          "score": "4-4",
+          "whoscored_id": 1821345,
+          "fotmob_id": 3901001,
+          "display": "Inter Milan 4-4 Juventus (2024-10-27)"
+        },
+        {
+          "id": "sa-007",
+          "home_team": "Napoli",
+          "away_team": "AC Milan",
+          "date": "2024-10-29",
+          "score": "2-0",
+          "whoscored_id": 1821346,
+          "fotmob_id": 3901002,
+          "display": "Napoli 2-0 AC Milan (2024-10-29)"
+        },
+        {
+          "id": "sa-008",
+          "home_team": "Lazio",
+          "away_team": "Inter Milan",
+          "date": "2024-11-11",
+          "score": "0-6",
+          "whoscored_id": 1821347,
+          "fotmob_id": 3901003,
+          "display": "Lazio 0-6 Inter Milan (2024-11-11)"
         }
       ]
     },
@@ -115,6 +305,66 @@
           "whoscored_id": 1821310,
           "fotmob_id": 3900966,
           "display": "RB Leipzig 1-2 Bayer Leverkusen (2024-05-04)"
+        },
+        {
+          "id": "bl-003",
+          "home_team": "Borussia Dortmund",
+          "away_team": "Bayern Munich",
+          "date": "2024-11-30",
+          "score": "1-1",
+          "whoscored_id": 1821348,
+          "fotmob_id": 3901004,
+          "display": "Borussia Dortmund 1-1 Bayern Munich (2024-11-30)"
+        },
+        {
+          "id": "bl-004",
+          "home_team": "Bayer Leverkusen",
+          "away_team": "Bayern Munich",
+          "date": "2024-09-28",
+          "score": "1-1",
+          "whoscored_id": 1821349,
+          "fotmob_id": 3901005,
+          "display": "Bayer Leverkusen 1-1 Bayern Munich (2024-09-28)"
+        },
+        {
+          "id": "bl-005",
+          "home_team": "Bayern Munich",
+          "away_team": "RB Leipzig",
+          "date": "2024-11-01",
+          "score": "5-1",
+          "whoscored_id": 1821350,
+          "fotmob_id": 3901006,
+          "display": "Bayern Munich 5-1 RB Leipzig (2024-11-01)"
+        },
+        {
+          "id": "bl-006",
+          "home_team": "Borussia Dortmund",
+          "away_team": "RB Leipzig",
+          "date": "2024-11-02",
+          "score": "2-1",
+          "whoscored_id": 1821351,
+          "fotmob_id": 3901007,
+          "display": "Borussia Dortmund 2-1 RB Leipzig (2024-11-02)"
+        },
+        {
+          "id": "bl-007",
+          "home_team": "Bayer Leverkusen",
+          "away_team": "Borussia Dortmund",
+          "date": "2024-10-11",
+          "score": "2-2",
+          "whoscored_id": 1821352,
+          "fotmob_id": 3901008,
+          "display": "Bayer Leverkusen 2-2 Borussia Dortmund (2024-10-11)"
+        },
+        {
+          "id": "bl-008",
+          "home_team": "RB Leipzig",
+          "away_team": "Bayern Munich",
+          "date": "2024-05-11",
+          "score": "2-5",
+          "whoscored_id": 1821353,
+          "fotmob_id": 3901009,
+          "display": "RB Leipzig 2-5 Bayern Munich (2024-05-11)"
         }
       ]
     },
@@ -142,6 +392,66 @@
           "whoscored_id": 1821312,
           "fotmob_id": 3900968,
           "display": "Monaco 2-2 Lyon (2024-05-12)"
+        },
+        {
+          "id": "l1-003",
+          "home_team": "Marseille",
+          "away_team": "PSG",
+          "date": "2024-10-27",
+          "score": "0-3",
+          "whoscored_id": 1821354,
+          "fotmob_id": 3901010,
+          "display": "Marseille 0-3 PSG (2024-10-27)"
+        },
+        {
+          "id": "l1-004",
+          "home_team": "PSG",
+          "away_team": "Monaco",
+          "date": "2024-08-18",
+          "score": "4-1",
+          "whoscored_id": 1821355,
+          "fotmob_id": 3901011,
+          "display": "PSG 4-1 Monaco (2024-08-18)"
+        },
+        {
+          "id": "l1-005",
+          "home_team": "Lyon",
+          "away_team": "PSG",
+          "date": "2024-09-15",
+          "score": "0-0",
+          "whoscored_id": 1821356,
+          "fotmob_id": 3901012,
+          "display": "Lyon 0-0 PSG (2024-09-15)"
+        },
+        {
+          "id": "l1-006",
+          "home_team": "Monaco",
+          "away_team": "Marseille",
+          "date": "2024-11-03",
+          "score": "2-1",
+          "whoscored_id": 1821357,
+          "fotmob_id": 3901013,
+          "display": "Monaco 2-1 Marseille (2024-11-03)"
+        },
+        {
+          "id": "l1-007",
+          "home_team": "Marseille",
+          "away_team": "Monaco",
+          "date": "2024-04-14",
+          "score": "2-0",
+          "whoscored_id": 1821358,
+          "fotmob_id": 3901014,
+          "display": "Marseille 2-0 Monaco (2024-04-14)"
+        },
+        {
+          "id": "l1-008",
+          "home_team": "PSG",
+          "away_team": "Lyon",
+          "date": "2024-05-19",
+          "score": "3-1",
+          "whoscored_id": 1821359,
+          "fotmob_id": 3901015,
+          "display": "PSG 3-1 Lyon (2024-05-19)"
         }
       ]
     },
@@ -169,6 +479,136 @@
           "whoscored_id": 1821314,
           "fotmob_id": 3900970,
           "display": "Bayern Munich 2-2 Arsenal (2024-04-17)"
+        },
+        {
+          "id": "ucl-003",
+          "home_team": "PSG",
+          "away_team": "Barcelona",
+          "date": "2024-04-10",
+          "score": "2-3",
+          "whoscored_id": 1821316,
+          "fotmob_id": 3900972,
+          "display": "PSG 2-3 Barcelona (2024-04-10)"
+        },
+        {
+          "id": "ucl-004",
+          "home_team": "Atletico Madrid",
+          "away_team": "Borussia Dortmund",
+          "date": "2024-04-10",
+          "score": "1-2",
+          "whoscored_id": 1821317,
+          "fotmob_id": 3900973,
+          "display": "Atletico Madrid 1-2 Borussia Dortmund (2024-04-10)"
+        },
+        {
+          "id": "ucl-005",
+          "home_team": "Manchester City",
+          "away_team": "Real Madrid",
+          "date": "2024-04-17",
+          "score": "1-1",
+          "whoscored_id": 1821318,
+          "fotmob_id": 3900974,
+          "display": "Manchester City 1-1 Real Madrid (2024-04-17)"
+        },
+        {
+          "id": "ucl-006",
+          "home_team": "Arsenal",
+          "away_team": "Bayern Munich",
+          "date": "2024-04-23",
+          "score": "2-2",
+          "whoscored_id": 1821319,
+          "fotmob_id": 3900975,
+          "display": "Arsenal 2-2 Bayern Munich (2024-04-23)"
+        },
+        {
+          "id": "ucl-007",
+          "home_team": "Barcelona",
+          "away_team": "PSG",
+          "date": "2024-04-16",
+          "score": "1-4",
+          "whoscored_id": 1821320,
+          "fotmob_id": 3900976,
+          "display": "Barcelona 1-4 PSG (2024-04-16)"
+        },
+        {
+          "id": "ucl-008",
+          "home_team": "Borussia Dortmund",
+          "away_team": "Atletico Madrid",
+          "date": "2024-04-16",
+          "score": "4-2",
+          "whoscored_id": 1821321,
+          "fotmob_id": 3900977,
+          "display": "Borussia Dortmund 4-2 Atletico Madrid (2024-04-16)"
+        },
+        {
+          "id": "ucl-009",
+          "home_team": "Borussia Dortmund",
+          "away_team": "PSG",
+          "date": "2024-05-01",
+          "score": "1-0",
+          "whoscored_id": 1821322,
+          "fotmob_id": 3900978,
+          "display": "Borussia Dortmund 1-0 PSG (2024-05-01)"
+        },
+        {
+          "id": "ucl-010",
+          "home_team": "Bayern Munich",
+          "away_team": "Real Madrid",
+          "date": "2024-04-30",
+          "score": "2-2",
+          "whoscored_id": 1821323,
+          "fotmob_id": 3900979,
+          "display": "Bayern Munich 2-2 Real Madrid (2024-04-30)"
+        },
+        {
+          "id": "ucl-011",
+          "home_team": "PSG",
+          "away_team": "Borussia Dortmund",
+          "date": "2024-05-07",
+          "score": "0-1",
+          "whoscored_id": 1821324,
+          "fotmob_id": 3900980,
+          "display": "PSG 0-1 Borussia Dortmund (2024-05-07)"
+        },
+        {
+          "id": "ucl-012",
+          "home_team": "Real Madrid",
+          "away_team": "Bayern Munich",
+          "date": "2024-05-08",
+          "score": "2-1",
+          "whoscored_id": 1821325,
+          "fotmob_id": 3900981,
+          "display": "Real Madrid 2-1 Bayern Munich (2024-05-08)"
+        },
+        {
+          "id": "ucl-013",
+          "home_team": "Real Madrid",
+          "away_team": "Borussia Dortmund",
+          "date": "2024-06-01",
+          "score": "2-0",
+          "whoscored_id": 1821326,
+          "fotmob_id": 3900982,
+          "display": "Real Madrid 2-0 Borussia Dortmund (2024-06-01)"
+        },
+        {
+          "id": "ucl-014",
+          "home_team": "Inter Milan",
+          "away_team": "Atletico Madrid",
+          "date": "2024-02-20",
+          "score": "1-0",
+          "whoscored_id": 1821327,
+          "fotmob_id": 3900983,
+          "display": "Inter Milan 1-0 Atletico Madrid (2024-02-20)"
+        },
+        {
+          "id": "ucl-015",
+          "home_team": "RB Leipzig",
+          "away_team": "Real Madrid",
+          "date": "2024-02-13",
+          "score": "0-1",
+          "whoscored_id": 1821328,
+          "fotmob_id": 3900984,
+          "display": "RB Leipzig 0-1 Real Madrid (2024-02-13)"
         }
       ]
     },
