@@ -9,14 +9,15 @@ from mplsoccer import Pitch
 from scipy.ndimage import gaussian_filter
 from matplotlib.colors import LinearSegmentedColormap, to_rgba
 
+from Visual.base_visualization import BaseVisualization
 
-class HeatmapVisualizations:
+
+class HeatmapVisualizations(BaseVisualization):
     """Create heatmap-based visualizations."""
 
-    def __init__(self, pitch_color='#d6c39f', line_color='#0e1117', show_colorbars: bool = True):
-        self.pitch_color = pitch_color
-        self.line_color = line_color
-        self.show_colorbars = show_colorbars
+    def __init__(self, theme_manager=None, pitch_color='#d6c39f', line_color='#0e1117',
+                 show_colorbars: bool = True):
+        super().__init__(theme_manager, pitch_color, line_color, show_colorbars)
 
     def _tinted_cmap(self, base_hex: str, dark_bg: bool = False) -> LinearSegmentedColormap:
         """Create a transparent-to-teamcolor ramp colormap."""
@@ -28,8 +29,7 @@ class HeatmapVisualizations:
 
     def create_defensive_actions_heatmap(self, ax, actions_df, team_color, team_name):
         """Create defensive actions heatmap (team-tinted, optional colorbar)."""
-        pitch = Pitch(pitch_type='custom', pitch_length=105, pitch_width=68,
-                     pitch_color=self.pitch_color, line_color=self.line_color, linewidth=1.5)
+        pitch = self.create_pitch()
         pitch.draw(ax=ax)
 
         im = None
@@ -41,33 +41,19 @@ class HeatmapVisualizations:
                                           bins=[x_bins, y_bins])
             heatmap = gaussian_filter(heatmap, sigma=1.0)
             
-            cmap = self._tinted_cmap(team_color, dark_bg=(self.line_color == '#d0d7de'))
+            cmap = self._tinted_cmap(team_color, dark_bg=self.is_dark_theme())
             im = ax.imshow(heatmap.T, extent=[0, 105, 0, 68], origin='lower',
                            cmap=cmap, alpha=1.0, aspect='auto', zorder=2)
 
-        ax.set_title(f'{team_name} Defensive Actions', fontsize=12, fontweight='bold')
+        self.prepare_axis(ax, f'{team_name} Defensive Actions')
 
         # Compact colorbar
-        if im is not None and self.show_colorbars:
-            try:
-                from mpl_toolkits.axes_grid1.inset_locator import inset_axes
-                cax = inset_axes(ax, width="40%", height="4%", loc='lower center',
-                                 bbox_to_anchor=(0.5, -0.08, 0.0, 0.0),
-                                 bbox_transform=ax.transAxes, borderpad=0)
-                cb = ax.figure.colorbar(im, cax=cax, orientation='horizontal')
-                if self.line_color == '#d0d7de':
-                    cb.outline.set_edgecolor('#9aa6b2')
-                    cb.ax.tick_params(labelsize=7, colors='#e6edf3')
-                    cb.set_label('Density', color='#e6edf3', fontsize=8)
-                else:
-                    cb.set_label('Density', fontsize=8)
-            except Exception:
-                pass
+        if im is not None:
+            self.add_colorbar(ax, im, label='Density')
 
     def create_touch_heatmap(self, ax, events_df, team_color, team_name):
         """Create player touches heatmap (optional colorbar)."""
-        pitch = Pitch(pitch_type='custom', pitch_length=105, pitch_width=68,
-                     pitch_color=self.pitch_color, line_color=self.line_color, linewidth=1.5)
+        pitch = self.create_pitch()
         pitch.draw(ax=ax)
 
         im = None
@@ -78,32 +64,18 @@ class HeatmapVisualizations:
             heatmap, _, _ = np.histogram2d(events_df['x'].values, events_df['y'].values,
                                           bins=[x_bins, y_bins])
             heatmap = gaussian_filter(heatmap, sigma=1.5)
-            
+
             im = ax.imshow(heatmap.T, extent=[0, 105, 0, 68], origin='lower',
                            cmap='YlOrRd', alpha=0.8, aspect='auto', zorder=2)
 
-        ax.set_title(f'{team_name} Touch Map', fontsize=12, fontweight='bold')
+        self.prepare_axis(ax, f'{team_name} Touch Map')
 
-        if im is not None and self.show_colorbars:
-            try:
-                from mpl_toolkits.axes_grid1.inset_locator import inset_axes
-                cax = inset_axes(ax, width="40%", height="4%", loc='lower center',
-                                 bbox_to_anchor=(0.5, -0.08, 0.0, 0.0),
-                                 bbox_transform=ax.transAxes, borderpad=0)
-                cb = ax.figure.colorbar(im, cax=cax, orientation='horizontal')
-                if self.line_color == '#d0d7de':
-                    cb.outline.set_edgecolor('#9aa6b2')
-                    cb.ax.tick_params(labelsize=7, colors='#e6edf3')
-                    cb.set_label('Density', color='#e6edf3', fontsize=8)
-                else:
-                    cb.set_label('Density', fontsize=8)
-            except Exception:
-                pass
+        if im is not None:
+            self.add_colorbar(ax, im, label='Density')
 
     def create_pitch_control_map(self, ax, home_events, away_events, home_color, away_color):
         """Create pitch control/dominance visualization."""
-        pitch = Pitch(pitch_type='custom', pitch_length=105, pitch_width=68,
-                     pitch_color=self.pitch_color, line_color=self.line_color, linewidth=1.5)
+        pitch = self.create_pitch()
         pitch.draw(ax=ax)
 
         import matplotlib.patches as patches
@@ -139,7 +111,7 @@ class HeatmapVisualizations:
                                             facecolor=color, alpha=min(alpha, 0.6), edgecolor='none', zorder=2)
                     ax.add_patch(rect)
 
-        ax.set_title('Pitch Control', fontsize=12, fontweight='bold')
+        self.prepare_axis(ax, 'Pitch Control')
 
         # Simple legend blocks (dark friendly)
         try:

@@ -6,24 +6,35 @@ Shot maps, pass networks, and other pitch-based visualizations.
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from mplsoccer import Pitch, VerticalPitch
-from matplotlib.colors import Normalize
+from mplsoccer import VerticalPitch
+from matplotlib.colors import Normalize, to_rgba
 import matplotlib.cm as cm
 from typing import Optional
-from matplotlib.colors import to_rgba
+
+from Visual.base_visualization import BaseVisualization
+from Visual.utils import filter_90min
 
 
-class PitchVisualizations:
+class PitchVisualizations(BaseVisualization):
     """Create pitch-based visualizations."""
 
-    def __init__(self, pitch_color='#d6c39f', line_color='#0e1117'):
-        self.pitch_color = pitch_color
-        self.line_color = line_color
+    def __init__(self, theme_manager=None, pitch_color='#d6c39f', line_color='#0e1117',
+                 show_colorbars=True):
+        """
+        Initialize pitch visualizations.
+
+        Args:
+            theme_manager: ThemeManager instance
+            pitch_color: Override pitch color (for backward compatibility)
+            line_color: Override line color (for backward compatibility)
+            show_colorbars: Whether to show colorbars
+        """
+        super().__init__(theme_manager, pitch_color, line_color, show_colorbars)
 
     def create_shot_map(self, ax, shots_home, shots_away, home_color, away_color):
         """Create shot map with shot outcome visualization."""
-        pitch = VerticalPitch(pitch_type='custom', pitch_length=105, pitch_width=68,
-                             pitch_color=self.pitch_color, line_color=self.line_color, linewidth=1.5)
+        # Create vertical pitch
+        pitch = self.pitch_factory.create_pitch(vertical=True)
         pitch.draw(ax=ax)
 
         # Plot home shots (bottom) - swap x,y for VerticalPitch
@@ -56,23 +67,22 @@ class PitchVisualizations:
             ax.scatter(shot['y'], 105-shot['x'], s=size, c=away_color, marker=marker,
                       alpha=alpha, edgecolors=edge, linewidths=2.5 if is_goal else 2, zorder=3)
 
-        ax.set_title('Shot Map', fontsize=12, fontweight='bold', pad=10)
+        self.prepare_axis(ax, 'Shot Map')
 
     def create_xg_shot_map(self, ax, shots_home: pd.DataFrame, shots_away: pd.DataFrame,
                             home_color: str, away_color: str,
                             cmap: str = 'inferno'):
-        """Dark-mode friendly xG shot map with color-mapped xG and rich markers.
+        """
+        xG shot map with color-mapped xG and rich markers.
 
-        - Uses VerticalPitch (105x68) with the class pitch colors.
+        - Uses VerticalPitch (105x68) with theme colors.
         - Colors markers by xG and scales size by xG.
         - Uses marker shape to distinguish header, set-piece, other.
         - Mirrors away shots to top half.
         - Adds an inset horizontal colorbar.
         """
-        pitch = VerticalPitch(
-            pitch_type='custom', pitch_length=105, pitch_width=68,
-            pitch_color=self.pitch_color, line_color=self.line_color, linewidth=1.5,
-        )
+        # Create vertical pitch
+        pitch = self.pitch_factory.create_pitch(vertical=True)
         pitch.draw(ax=ax)
 
         norm = Normalize(vmin=0.0, vmax=1.0)
@@ -81,8 +91,8 @@ class PitchVisualizations:
         # If no shots at all, show an informative message
         if (shots_home is None or shots_home.empty) and (shots_away is None or shots_away.empty):
             ax.text(0.5, 0.5, 'No shots yet', transform=ax.transAxes,
-                    ha='center', va='center', fontsize=12, color='#e6edf3')
-            ax.set_title('xG Shot Map', fontsize=12, fontweight='bold', pad=10, color='#e6edf3' if self.line_color == '#d0d7de' else 'black')
+                    ha='center', va='center', fontsize=12, color=self.get_text_color())
+            self.prepare_axis(ax, 'xG Shot Map')
             return
 
         def marker_for(shot_row: pd.Series):
@@ -136,45 +146,40 @@ class PitchVisualizations:
             for _, r in shots_away.iterrows():
                 plot_shot(r, is_home=False)
 
-        # Add colorbar inset
-        try:
-            from mpl_toolkits.axes_grid1.inset_locator import inset_axes
-            if last_pathcoll is not None:
-                cax = inset_axes(ax, width="40%", height="4%", loc='lower center',
-                                 bbox_to_anchor=(0.5, -0.08, 0.0, 0.0),
-                                 bbox_transform=ax.transAxes, borderpad=0)
-                cb = plt.colorbar(cm.ScalarMappable(norm=norm, cmap=cmap_obj), cax=cax, orientation='horizontal')
-                cb.outline.set_edgecolor('#9aa6b2')
-                cb.ax.tick_params(labelsize=7, colors='#e6edf3')
-                cb.set_label('xG', color='#e6edf3', fontweight='bold')
-        except Exception:
-            pass
+        # Add colorbar using utility
+        if last_pathcoll is not None:
+            mappable = cm.ScalarMappable(norm=norm, cmap=cmap_obj)
+            self.add_colorbar(ax, mappable, label='xG',
+                            bbox_to_anchor=(0.5, -0.08, 0.0, 0.0))
 
-        ax.set_title('xG Shot Map', fontsize=12, fontweight='bold', pad=10, color='#e6edf3' if self.line_color == '#d0d7de' else 'black')
+        self.prepare_axis(ax, 'xG Shot Map')
 
-    def create_pass_network(self, ax, avg_positions_df, pass_connections_df, team_color, team_name):
+    def create_pass_network(self, ax, avg_positions_df, pass_connections_df,
+                           team_color, team_name, simple_mode=False):
         """
-        Create enhanced pass network visualization with:
+        Create enhanced pass network visualization.
+
         - Line widths based on pass volume
         - Player marker sizes based on number of passes
         - Transparency based on pass volume
         - Player initials on markers
-        
+
         Args:
             ax: Matplotlib axis
             avg_positions_df: DataFrame with player average positions
             pass_connections_df: DataFrame with pass connections
             team_color: Team color
             team_name: Team name
+            simple_mode: If True, use simpler visualization
         """
-        # Use custom pitch (105x68m)
-        pitch = Pitch(pitch_type='custom', pitch_length=105, pitch_width=68,
-                     pitch_color=self.pitch_color, line_color=self.line_color, linewidth=1.5)
+        # Create pitch
+        pitch = self.create_pitch()
         pitch.draw(ax=ax)
 
         if avg_positions_df.empty:
-            ax.text(52.5, 34, 'No Data Available', ha='center', va='center', fontsize=10)
-            ax.set_title(f'{team_name} Pass Network', fontsize=12, fontweight='bold')
+            ax.text(52.5, 34, 'No Data Available', ha='center', va='center',
+                   fontsize=10, color=self.get_text_color())
+            self.prepare_axis(ax, f'{team_name} Pass Network')
             return
 
         # Constants for scaling
@@ -198,7 +203,7 @@ class PitchVisualizations:
                 transparency = (transparency * (1 - MIN_TRANSPARENCY)) + MIN_TRANSPARENCY
                 color[:, 3] = transparency
 
-                # Draw pass lines - use enumerate to get sequential index
+                # Draw pass lines
                 for i, (idx, row) in enumerate(pass_connections_df.iterrows()):
                     if pd.notna(row.get('x')) and pd.notna(row.get('y')) and \
                        pd.notna(row.get('x_end')) and pd.notna(row.get('y_end')):
@@ -225,7 +230,7 @@ class PitchVisualizations:
         # Draw player markers
         for _, player in avg_positions_df.iterrows():
             # Draw marker (hexagon shape)
-            ax.scatter(player['x'], player['y'], 
+            ax.scatter(player['x'], player['y'],
                       s=player['marker_size'],
                       marker='h',  # hexagon
                       c='white',
@@ -240,7 +245,7 @@ class PitchVisualizations:
                 # Create initials from player name
                 name_parts = name.split()
                 initials = "".join(word[0] for word in name_parts if word).upper()
-                
+
                 # Draw initials
                 ax.text(player['x'], player['y'], initials,
                        ha='center', va='center',
@@ -255,51 +260,4 @@ class PitchVisualizations:
                        color=team_color,
                        zorder=4)
 
-        ax.set_title(f'{team_name} Pass Network', fontsize=12, fontweight='bold', pad=10)
-
-    def create_pass_network_simple(self, ax, player_positions, pass_connections, team_color, team_name):
-        """
-        Create simple pass network (old version, kept for compatibility).
-        """
-        pitch = Pitch(pitch_type='custom', pitch_length=105, pitch_width=68,
-                     pitch_color=self.pitch_color, line_color=self.line_color, linewidth=1.5)
-        pitch.draw(ax=ax)
-
-        if player_positions.empty:
-            ax.text(52.5, 34, 'No Data Available', ha='center', va='center')
-            ax.set_title(f'{team_name} Pass Network', fontsize=12, fontweight='bold')
-            return
-
-        # Plot pass lines
-        if not pass_connections.empty:
-            max_passes = pass_connections['pass_count'].max() if 'pass_count' in pass_connections.columns else 1
-            for _, conn in pass_connections.iterrows():
-                passer = player_positions[player_positions['player_id'] == conn['playerId']] \
-                    if 'playerId' in conn else player_positions[player_positions['player_id'] == conn['pos_min']]
-                receiver = player_positions[player_positions['player_id'] == conn['receiver']] \
-                    if 'receiver' in conn else player_positions[player_positions['player_id'] == conn['pos_max']]
-                
-                if not passer.empty and not receiver.empty:
-                    lw = 0.5 + (conn.get('pass_count', 1) / max_passes) * 4
-                    x_col = 'avg_x' if 'avg_x' in passer.columns else 'x'
-                    y_col = 'avg_y' if 'avg_y' in passer.columns else 'y'
-                    
-                    ax.plot([passer.iloc[0][x_col], receiver.iloc[0][x_col]],
-                           [passer.iloc[0][y_col], receiver.iloc[0][y_col]],
-                           color=team_color, linewidth=lw, alpha=0.6, zorder=1)
-
-        # Plot players
-        for _, player in player_positions.iterrows():
-            x_col = 'avg_x' if 'avg_x' in player.index else 'x'
-            y_col = 'avg_y' if 'avg_y' in player.index else 'y'
-            
-            ax.scatter(player[x_col], player[y_col], s=600, c=team_color,
-                      edgecolors='white', linewidths=2, zorder=3, alpha=0.9)
-            
-            shirt_no = player.get('shirt_no', '?')
-            ax.text(player[x_col], player[y_col], str(shirt_no),
-                   ha='center', va='center', fontsize=9, fontweight='bold',
-                   color='white', zorder=4)
-
-        ax.set_title(f'{team_name} Pass Network', fontsize=12, fontweight='bold')
-
+        self.prepare_axis(ax, f'{team_name} Pass Network')

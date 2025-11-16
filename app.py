@@ -23,34 +23,160 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Custom CSS
+# Custom CSS - Black & White Minimalist Design
 st.markdown("""
     <style>
+    /* Global Styles */
     .main {
-        background-color: #f0f0f0;
+        background-color: #ffffff;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     }
+
+    /* Typography */
+    h1 {
+        color: #000000;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        margin-bottom: 0.5em;
+    }
+
+    h2 {
+        color: #000000;
+        font-weight: 600;
+        letter-spacing: -0.01em;
+        margin-top: 2em;
+        margin-bottom: 0.5em;
+        border-bottom: 1px solid #e0e0e0;
+        padding-bottom: 0.3em;
+    }
+
+    h3 {
+        color: #333333;
+        font-weight: 600;
+        margin-top: 1.5em;
+    }
+
+    p {
+        color: #666666;
+        line-height: 1.6;
+    }
+
+    /* Sidebar */
+    [data-testid="stSidebar"] {
+        background-color: #fafafa;
+        border-right: 1px solid #e0e0e0;
+    }
+
+    [data-testid="stSidebar"] h1 {
+        font-size: 1.5rem;
+        margin-bottom: 2rem;
+        color: #000000;
+    }
+
+    /* Buttons */
     .stButton>button {
         width: 100%;
-        background-color: #4CAF50;
-        color: white;
-        font-weight: bold;
+        background-color: #000000;
+        color: #ffffff;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        font-weight: 600;
+        letter-spacing: 0.02em;
+        transition: all 0.2s;
+        border-radius: 4px;
     }
+
     .stButton>button:hover {
-        background-color: #45a049;
+        background-color: #333333;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     }
-    h1 {
-        color: #2c3e50;
-        text-align: center;
+
+    /* Inputs */
+    .stNumberInput input,
+    .stTextInput input,
+    .stSelectbox select {
+        border: 1px solid #e0e0e0;
+        border-radius: 4px;
+        padding: 0.5rem;
+        background-color: #ffffff;
     }
-    h2 {
-        color: #34495e;
+
+    .stNumberInput input:focus,
+    .stTextInput input:focus,
+    .stSelectbox select:focus {
+        border-color: #000000;
+        box-shadow: 0 0 0 1px #000000;
+        outline: none;
     }
+
+    /* Checkbox */
+    .stCheckbox {
+        color: #333333;
+    }
+
+    /* Cards/Panels */
     .match-info {
-        background-color: white;
-        padding: 20px;
-        border-radius: 10px;
-        margin: 10px 0;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        background-color: #fafafa;
+        border: 1px solid #e0e0e0;
+        padding: 2rem;
+        margin: 2rem 0;
+        border-radius: 4px;
+    }
+
+    /* Metrics */
+    [data-testid="stMetricValue"] {
+        color: #000000;
+        font-weight: 700;
+    }
+
+    [data-testid="stMetricLabel"] {
+        color: #666666;
+        font-weight: 500;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 0.05em;
+    }
+
+    /* Dividers */
+    hr {
+        border: none;
+        border-top: 1px solid #e0e0e0;
+        margin: 2rem 0;
+    }
+
+    /* Expanders */
+    .streamlit-expanderHeader {
+        background-color: #fafafa;
+        border: 1px solid #e0e0e0;
+        color: #000000;
+        font-weight: 600;
+        border-radius: 4px;
+    }
+
+    .streamlit-expanderHeader:hover {
+        background-color: #f5f5f5;
+    }
+
+    /* Info boxes */
+    .stAlert {
+        background-color: #fafafa;
+        border: 1px solid #e0e0e0;
+        color: #333333;
+        border-radius: 4px;
+    }
+
+    /* Download button */
+    .stDownloadButton>button {
+        background-color: #ffffff;
+        color: #000000;
+        border: 1px solid #000000;
+        font-weight: 600;
+    }
+
+    .stDownloadButton>button:hover {
+        background-color: #000000;
+        color: #ffffff;
     }
     </style>
     """, unsafe_allow_html=True)
@@ -143,6 +269,14 @@ def main():
 
         # Options
         st.subheader("Options")
+
+        theme_option = st.selectbox(
+            "Report Theme",
+            options=["Dark", "Light", "Monochrome"],
+            index=0,
+            help="Choose visualization theme (Monochrome = black & white)"
+        )
+
         dpi_setting = st.select_slider(
             "Report Quality",
             options=[80, 100, 150, 200, 300],
@@ -237,8 +371,9 @@ def main():
             try:
                 # Generate report
                 fotmob_id_value = fotmob_id if fotmob_id > 0 else None
+                theme_value = theme_option.lower()
 
-                fig, match_summary = generate_report_cached(whoscored_id, fotmob_id_value)
+                fig, match_summary = generate_report_cached(whoscored_id, fotmob_id_value, theme=theme_value)
 
                 # Extract data from match_summary
                 home_name = match_summary['teams']['home']['name']

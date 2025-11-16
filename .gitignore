@@ -50,3 +50,24 @@ playwright-state.json
 
 # Logs
 *.log
+
+# Cache
+cache/
+*.cache
+
+# Temporary files
+_*.py
+_*.txt
+tmp_*.py
+tmp_*.txt
+
+# Test outputs
+test_*.png
+test_*.svg
+dark_report_*.png
+light_report_*.png
+
+# Report outputs (optional - uncomment if you don't want to track generated reports)
+# *.png
+# *.svg
+# *.pdf

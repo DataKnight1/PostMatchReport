@@ -8,13 +8,15 @@ import numpy as np
 import pandas as pd
 import matplotlib.patches as patches
 
+from Visual.base_visualization import BaseVisualization
 
-class AdvancedVisualizations:
+
+class AdvancedVisualizations(BaseVisualization):
     """Create advanced analytical visualizations."""
 
-    def __init__(self, pitch_color: str = '#d6c39f', line_color: str = '#0e1117'):
-        self.pitch_color = pitch_color
-        self.line_color = line_color
+    def __init__(self, theme_manager=None, pitch_color: str = '#d6c39f',
+                 line_color: str = '#0e1117', show_colorbars: bool = True):
+        super().__init__(theme_manager, pitch_color, line_color, show_colorbars)
 
     def create_momentum_graph(self, ax, events_df, home_id, away_id, home_color, away_color, home_name, away_name):
         """Net momentum around zero using weighted attacking actions.
@@ -23,8 +25,8 @@ class AdvancedVisualizations:
         """
         if events_df is None or events_df.empty:
             ax.axis('off')
-            txt = '#e6edf3' if getattr(self, 'line_color', '#0e1117') == '#d0d7de' else 'black'
-            ax.text(0.5, 0.5, 'No Data Available', ha='center', va='center', color=txt)
+            ax.text(0.5, 0.5, 'No Data Available', ha='center', va='center',
+                   color=self.get_text_color())
             return
 
         df = events_df[events_df['cumulative_mins'] <= 90].copy()
@@ -71,7 +73,7 @@ class AdvancedVisualizations:
 
         ax.axvline(45, color='#9aa6b2', linestyle='-', linewidth=1.0, alpha=0.6)
         ax.text(45, 95, 'HT', ha='center', va='center', fontsize=8,
-                color='#e6edf3' if getattr(self, 'line_color', '#0e1117') == '#d0d7de' else 'black')
+                color=self.get_text_color())
 
         goals = df[df['type_display'] == 'Goal']
         for _, g in goals.iterrows():
@@ -81,7 +83,7 @@ class AdvancedVisualizations:
                        marker='*', edgecolors='gold', linewidths=1.8, zorder=4)
             lbl = f"{int(g.get('minute', g['cumulative_mins']))}'"
             ax.text(g['cumulative_mins'], y, lbl, fontsize=7,
-                    ha='center', va='center', color='#e6edf3' if getattr(self, 'line_color', '#0e1117') == '#d0d7de' else 'black')
+                    ha='center', va='center', color=self.get_text_color())
 
         ax.set_xlim(0, 90)
         ax.set_ylim(-100, 100)
@@ -89,7 +91,7 @@ class AdvancedVisualizations:
         ax.set_yticklabels(['Away', '', 'Even', '', 'Home'])
         ax.set_xlabel('Match Time (minutes)')
         ax.set_ylabel('Net Momentum')
-        ax.set_title('Match Momentum (net)')
+        self.prepare_axis(ax, 'Match Momentum (net)')
         ax.legend(loc='upper left', fontsize=8, framealpha=0.9)
         ax.grid(True, alpha=0.15, axis='x')
 
@@ -97,9 +99,8 @@ class AdvancedVisualizations:
         """Create shot timeline showing when shots were taken."""
         if shots_df is None or shots_df.empty:
             ax.axis('off')
-            # Pick readable color on dark
-            txt_color = '#e6edf3' if getattr(self, 'line_color', '#0e1117') == '#d0d7de' else 'black'
-            ax.text(0.5, 0.5, 'No Shot Data', ha='center', va='center', fontsize=11, color=txt_color)
+            ax.text(0.5, 0.5, 'No Shot Data', ha='center', va='center', fontsize=11,
+                   color=self.get_text_color())
             return
 
         # Filter to 90 minutes for consistency
@@ -141,7 +142,7 @@ class AdvancedVisualizations:
         ax.set_yticks([0, 1])
         ax.set_yticklabels(['Away', 'Home'], fontsize=9)
         ax.set_xlabel('Match Time (minutes)', fontsize=9)
-        ax.set_title('Shot Timeline', fontsize=12, fontweight='bold')
+        self.prepare_axis(ax, 'Shot Timeline')
         ax.grid(True, alpha=0.2, axis='x')
 
         # Mark half-time
@@ -165,10 +166,7 @@ class AdvancedVisualizations:
 
     def create_zone14_map(self, ax, passes_df, team_color, team_name):
         """Create Zone 14 and half-spaces visualization."""
-        from mplsoccer import Pitch
-
-        pitch = Pitch(pitch_type='custom', pitch_length=105, pitch_width=68,
-                      pitch_color=self.pitch_color, line_color=self.line_color, linewidth=1.5)
+        pitch = self.create_pitch()
         pitch.draw(ax=ax)
 
         # Define zones
@@ -198,7 +196,7 @@ class AdvancedVisualizations:
                            color=team_color, linewidth=1.5, alpha=0.5, zorder=3)
                     ax.scatter(p['x'], p['y'], s=30, c=team_color, alpha=0.7, zorder=4)
 
-        ax.set_title(f'{team_name} Zone 14 & Half-Spaces', fontsize=12, fontweight='bold')
+        self.prepare_axis(ax, f'{team_name} Zone 14 & Half-Spaces')
 
     def create_cumulative_xg(self, ax, shots_df, home_id, away_id,
                               home_color, away_color, home_name, away_name):
@@ -208,8 +206,8 @@ class AdvancedVisualizations:
         """
         if shots_df is None or shots_df.empty:
             ax.axis('off')
-            txt_color = '#e6edf3' if self.line_color == '#d0d7de' else 'black'
-            ax.text(0.5, 0.5, 'No Shot Data', ha='center', va='center', fontsize=11, color=txt_color)
+            ax.text(0.5, 0.5, 'No Shot Data', ha='center', va='center', fontsize=11,
+                   color=self.get_text_color())
             return
 
         cols = ['teamId', 'cumulative_mins', 'xg', 'type_display', 'x', 'y', 'qualifiers_dict', 'dist_to_goal', 'angle', 'outcome_display']
@@ -317,7 +315,7 @@ class AdvancedVisualizations:
         ax.set_ylim(0, ymax)
         ax.set_xlabel('Match Time (minutes)')
         ax.set_ylabel('Cumulative xG')
-        ax.set_title('Cumulative xG (steps)')
+        self.prepare_axis(ax, 'Cumulative xG (steps)')
         ax.grid(True, axis='x', alpha=0.15)
         ax.legend(loc='lower right', fontsize=8, framealpha=0.9)
 

@@ -9,13 +9,16 @@ from matplotlib.patches import Circle, Rectangle, Arc, Polygon
 from mplsoccer import Pitch
 from typing import Dict, Any, Optional
 
+from Visual.base_visualization import BaseVisualization
 
-class TacticalVisualizer:
+
+class TacticalVisualizer(BaseVisualization):
     """Create tactical analysis visualizations."""
 
-    def __init__(self):
+    def __init__(self, theme_manager=None, pitch_color='#d6c39f', line_color='#0e1117',
+                 show_colorbars: bool = True):
         """Initialize tactical visualizer."""
-        pass
+        super().__init__(theme_manager, pitch_color, line_color, show_colorbars)
 
     def create_zonal_control_map(self, ax, zone_matrix: np.ndarray,
                                  home_team: Dict[str, Any], away_team: Dict[str, Any],
@@ -42,7 +45,8 @@ class TacticalVisualizer:
         ax.axis('off')
 
         # Set background
-        ax.set_facecolor('#f5f5f5')
+        bg_color = self.get_surface_color()
+        ax.set_facecolor(bg_color)
 
         # Pitch dimensions
         pitch_length = 105.0
@@ -55,8 +59,8 @@ class TacticalVisualizer:
         zone_length = pitch_length / grid_cols
         zone_width = pitch_width / grid_rows
 
-        # Define colors
-        contested_color = '#d0d0d0'
+        # Define colors (use theme-appropriate color for contested zones)
+        contested_color = '#d0d0d0' if not self.is_dark_theme() else '#4a5568'
 
         # Draw zone fills first (background layer)
         for row in range(grid_rows):
@@ -86,22 +90,23 @@ class TacticalVisualizer:
         # Draw pitch markings (on top of zones)
         self._draw_pitch_markings(ax, pitch_length, pitch_width)
 
-        # Draw grid lines
+        # Draw grid lines (use theme-appropriate color)
+        grid_color = self.get_secondary_text_color()
         for i in range(grid_cols + 1):
             x = i * zone_length
-            ax.plot([x, x], [0, pitch_width], color='#333333',
+            ax.plot([x, x], [0, pitch_width], color=grid_color,
                    linewidth=0.8, alpha=0.4, zorder=3)
 
         for i in range(grid_rows + 1):
             y = i * zone_width
-            ax.plot([0, pitch_length], [y, y], color='#333333',
+            ax.plot([0, pitch_length], [y, y], color=grid_color,
                    linewidth=0.8, alpha=0.4, zorder=3)
 
         # Add title
         title_text = 'Zonal Control by Touches'
         ax.text(pitch_length / 2, pitch_width + 4, title_text,
                ha='center', va='bottom', fontsize=16, fontweight='bold',
-               color='#333333')
+               color=self.get_text_color())
 
         # Add team names with attack direction arrows
         home_name = home_team.get('name', 'Home')
@@ -122,35 +127,37 @@ class TacticalVisualizer:
         # Add legend at bottom
         legend_y = -3
         legend_x_start = pitch_length / 2 - 20
+        legend_edge_color = self.get_text_color()
+        legend_text_color = self.get_text_color()
 
         # Home legend
         legend_rect_home = Rectangle((legend_x_start, legend_y), 3, 2,
-                                     facecolor=home_color, edgecolor='#333333',
+                                     facecolor=home_color, edgecolor=legend_edge_color,
                                      alpha=0.3, linewidth=0.5)
         ax.add_patch(legend_rect_home)
         ax.text(legend_x_start + 4, legend_y + 1, home_name,
-               ha='left', va='center', fontsize=9, color='#333333')
+               ha='left', va='center', fontsize=9, color=legend_text_color)
 
         # Away legend
         legend_rect_away = Rectangle((legend_x_start + 15, legend_y), 3, 2,
-                                     facecolor=away_color, edgecolor='#333333',
+                                     facecolor=away_color, edgecolor=legend_edge_color,
                                      alpha=0.3, linewidth=0.5)
         ax.add_patch(legend_rect_away)
         ax.text(legend_x_start + 19, legend_y + 1, away_name,
-               ha='left', va='center', fontsize=9, color='#333333')
+               ha='left', va='center', fontsize=9, color=legend_text_color)
 
         # Contested legend
         legend_rect_contested = Rectangle((legend_x_start + 30, legend_y), 3, 2,
-                                         facecolor=contested_color, edgecolor='#333333',
+                                         facecolor=contested_color, edgecolor=legend_edge_color,
                                          alpha=0.2, linewidth=0.5)
         ax.add_patch(legend_rect_contested)
         ax.text(legend_x_start + 34, legend_y + 1, 'Contested',
-               ha='left', va='center', fontsize=9, color='#333333')
+               ha='left', va='center', fontsize=9, color=legend_text_color)
 
         # Add footer note
         footer_text = f'Grid: {grid_cols}×{grid_rows} zones | Control based on touch count'
         ax.text(pitch_length / 2, -4.5, footer_text,
-               ha='center', va='top', fontsize=8, color='#666666',
+               ha='center', va='top', fontsize=8, color=self.get_secondary_text_color(),
                style='italic')
 
     def _draw_pitch_markings(self, ax, length: float = 105.0, width: float = 68.0):

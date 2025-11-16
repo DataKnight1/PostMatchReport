@@ -11,19 +11,29 @@ from matplotlib.offsetbox import OffsetImage, AnnotationBbox
 import matplotlib.image as mpimg
 import os
 
+from Visual.base_visualization import BaseVisualization
 
-class StatisticalVisualizations:
+
+class StatisticalVisualizations(BaseVisualization):
     """Create statistical visualizations."""
 
-    def create_match_summary_panel(self, ax, match_info, text_color: str = 'black', rows: list | None = None):
+    def __init__(self, theme_manager=None, pitch_color='#d6c39f', line_color='#0e1117',
+                 show_colorbars: bool = True):
+        super().__init__(theme_manager, pitch_color, line_color, show_colorbars)
+
+    def create_match_summary_panel(self, ax, match_info, text_color: str = None, rows: list | None = None):
         """Create match summary statistics panel.
 
         Args:
             ax: Matplotlib axis
             match_info: Summary dict from MatchProcessor
-            text_color: Base text color (use 'white' for dark mode)
+            text_color: Base text color (deprecated - uses theme if None)
             rows: Optional list of (label, home_value, away_value). If None, a sensible default is computed.
         """
+        # Use theme color if not explicitly provided
+        if text_color is None:
+            text_color = self.get_text_color()
+
         ax.axis('off')
 
         home_name = match_info.get('teams', {}).get('home', {}).get('name', 'Home')
@@ -185,7 +195,7 @@ class StatisticalVisualizations:
         # Draw zebra row backgrounds and aligned text
         bg_dark = '#2f363f'
         bg_light = '#e9ecef'
-        is_dark = text_color.lower() in ('white', '#ffffff', '#e6edf3')
+        is_dark = self.is_dark_theme()
         row_bg = bg_dark if is_dark else bg_light
         alt_row_bg = (0.85, 0.85, 0.85, 0.35) if not is_dark else (0.22, 0.25, 0.30, 0.5)
 
@@ -227,8 +237,8 @@ class StatisticalVisualizations:
         ax.set_yticks(y_pos)
         ax.set_yticklabels(['Home', 'Away'])
         ax.set_xlabel(stat_name)
-        ax.set_title(f'{stat_name} Comparison', fontweight='bold')
-        
+        self.prepare_axis(ax, f'{stat_name} Comparison')
+
         for i, v in enumerate(values):
             ax.text(v, i, f' {v}', va='center', fontweight='bold')
 

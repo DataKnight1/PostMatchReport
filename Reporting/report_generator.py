@@ -10,6 +10,7 @@ import os
 
 from ETL.loaders.data_loader import DataLoader
 from ETL.transformers.match_processor import MatchProcessor
+from Visual.theme_manager import ThemeManager
 from Visual.pitch_visualizations import PitchVisualizations
 from Visual.statistical_visualizations import StatisticalVisualizations
 from Visual.heatmap_visualizations import HeatmapVisualizations
@@ -26,31 +27,23 @@ class ReportGenerator:
 
         Args:
             cache_dir: Directory for caching data
-            theme: 'dark' or 'light'
+            theme: 'dark', 'light', or 'monochrome'
         """
         self.cache_dir = cache_dir
         self.data_loader = DataLoader(cache_dir)
         self.show_colorbars = show_colorbars
 
-        # Initialize visualization modules
-        self.theme = theme.lower()
-        if self.theme == 'dark':
-            # Dark grey palette
-            self.bg_color = '#22272e'
-            self.text_color = '#e6edf3'
-            pitch_color = '#2b313a'
-            line_color = '#d0d7de'
-        else:
-            self.bg_color = '#f0f0f0'
-            self.text_color = 'black'
-            pitch_color = '#d6c39f'
-            line_color = '#0e1117'
+        # Initialize theme manager
+        self.theme_manager = ThemeManager(theme)
+        self.bg_color = self.theme_manager.get_color('background')
+        self.text_color = self.theme_manager.get_color('text_primary')
 
-        self.pitch_viz = PitchVisualizations(pitch_color=pitch_color, line_color=line_color)
-        self.stats_viz = StatisticalVisualizations()
-        self.heatmap_viz = HeatmapVisualizations(pitch_color=pitch_color, line_color=line_color, show_colorbars=self.show_colorbars)
-        self.advanced_viz = AdvancedVisualizations(pitch_color=pitch_color, line_color=line_color)
-        self.tactical_viz = TacticalVisualizer()
+        # Initialize visualization modules with theme manager
+        self.pitch_viz = PitchVisualizations(theme_manager=self.theme_manager, show_colorbars=self.show_colorbars)
+        self.stats_viz = StatisticalVisualizations(theme_manager=self.theme_manager, show_colorbars=self.show_colorbars)
+        self.heatmap_viz = HeatmapVisualizations(theme_manager=self.theme_manager, show_colorbars=self.show_colorbars)
+        self.advanced_viz = AdvancedVisualizations(theme_manager=self.theme_manager, show_colorbars=self.show_colorbars)
+        self.tactical_viz = TacticalVisualizer(theme_manager=self.theme_manager, show_colorbars=self.show_colorbars)
 
     def _find_team_logo(self, team_id: Optional[int], team_name: Optional[str]) -> Optional[str]:
         """Try to resolve a team logo path locally under config/logos.
@@ -187,44 +180,14 @@ class ReportGenerator:
         gs = fig.add_gridspec(4, 3, hspace=0.3, wspace=0.3,
                              left=0.05, right=0.95, top=0.95, bottom=0.05)
 
-        def _apply_dark(ax):
-            if self.theme != 'dark':
-                return
-            try:
-                for spine in ax.spines.values():
-                    spine.set_color('#9aa6b2')
-            except Exception:
-                pass
-            ax.tick_params(colors=self.text_color)
-            for lbl in ax.get_xticklabels() + ax.get_yticklabels():
-                try:
-                    lbl.set_color(self.text_color)
-                except Exception:
-                    pass
-            try:
-                ax.set_title(ax.get_title(), color=self.text_color)
-                ax.xaxis.label.set_color(self.text_color)
-                ax.yaxis.label.set_color(self.text_color)
-                leg = ax.get_legend()
-                if leg is not None:
-                    for text in leg.get_texts():
-                        text.set_color(self.text_color)
-                    leg.get_frame().set_edgecolor('#9aa6b2')
-            except Exception:
-                pass
-
         # Row 1
         ax1 = fig.add_subplot(gs[0, 0])
         ax1.set_facecolor(self.bg_color)
-        self.stats_viz.create_match_summary_panel(ax1, match_summary, text_color=self.text_color)
-        _apply_dark(ax1)
+        self.stats_viz.create_match_summary_panel(ax1, match_summary)
 
         ax2 = fig.add_subplot(gs[0, 1])
         ax2.set_facecolor(self.bg_color)
-        # Dark xG shot map
         self.pitch_viz.create_xg_shot_map(ax2, shots_home, shots_away, home_color, away_color)
-        _apply_dark(ax2)
-
 
         ax3 = fig.add_subplot(gs[0, 2])
         ax3.set_facecolor(self.bg_color)
@@ -236,7 +199,6 @@ class ReportGenerator:
         ax4.set_facecolor(self.bg_color)
         self.pitch_viz.create_pass_network(ax4, home_positions, home_connections,
                                            home_color, home_name)
-        _apply_dark(ax4)
 
         ax5 = fig.add_subplot(gs[1, 1])
         ax5.set_facecolor(self.bg_color)
@@ -246,39 +208,33 @@ class ReportGenerator:
         self.advanced_viz.create_cumulative_xg(ax5, all_shots,
                                               home_id, away_id, home_color, away_color,
                                               home_name, away_name)
-        _apply_dark(ax5)
 
         ax6 = fig.add_subplot(gs[1, 2])
         ax6.set_facecolor(self.bg_color)
         self.pitch_viz.create_pass_network(ax6, away_positions, away_connections,
                                            away_color, away_name)
-        _apply_dark(ax6)
 
         # Row 3
         ax7 = fig.add_subplot(gs[2, 0])
         ax7.set_facecolor(self.bg_color)
         self.advanced_viz.create_zone14_map(ax7, passes_home, home_color, home_name)
-        _apply_dark(ax7)
 
         ax8 = fig.add_subplot(gs[2, 1])
         ax8.set_facecolor(self.bg_color)
-        self.heatmap_viz.create_pitch_control_map(ax8, 
+        self.heatmap_viz.create_pitch_control_map(ax8,
                                                   events_df[events_df['teamId']==home_id],
                                                   events_df[events_df['teamId']==away_id],
                                                   home_color, away_color)
-        _apply_dark(ax8)
 
         ax9 = fig.add_subplot(gs[2, 2])
         ax9.set_facecolor(self.bg_color)
         self.advanced_viz.create_zone14_map(ax9, passes_away, away_color, away_name)
-        _apply_dark(ax9)
 
         # Row 4
         ax10 = fig.add_subplot(gs[3, 0])
         ax10.set_facecolor(self.bg_color)
         self.heatmap_viz.create_defensive_actions_heatmap(ax10, def_actions_home,
                                                           home_color, home_name)
-        _apply_dark(ax10)
 
         ax11 = fig.add_subplot(gs[3, 1])
         ax11.set_facecolor(self.bg_color)
@@ -300,17 +256,15 @@ class ReportGenerator:
             # Fallback to touch heatmap if no data
             self.heatmap_viz.create_touch_heatmap(ax11, events_df[events_df['teamId']==home_id],
                                                   home_color, home_name)
-        _apply_dark(ax11)
 
         ax12 = fig.add_subplot(gs[3, 2])
         ax12.set_facecolor(self.bg_color)
         self.heatmap_viz.create_defensive_actions_heatmap(ax12, def_actions_away,
                                                           away_color, away_name)
-        _apply_dark(ax12)
 
         # Add watermark
         fig.text(0.5, 0.01, 'PostMatchReport - Advanced Football Analytics',
-                ha='center', fontsize=10, alpha=0.6, style='italic', color='white' if self.theme=='dark' else 'black')
+                ha='center', fontsize=10, alpha=0.6, style='italic', color=self.text_color)
 
         # Save if requested
         if output_file:
