@@ -66,12 +66,15 @@ class AdvancedVisualizations(BaseVisualization):
         except Exception:
             pass
 
-        ax.axhline(0, color='#9aa6b2', linestyle='--', linewidth=1.2, alpha=0.6)
+        # Use theme border color for grid lines
+        grid_color = self.theme.get_color('border')
+
+        ax.axhline(0, color=grid_color, linestyle='--', linewidth=1.2, alpha=0.6)
         ax.fill_between(centers, 0, net, where=net>=0, color=home_color, alpha=0.45, label=home_name)
         ax.fill_between(centers, 0, net, where=net<0, color=away_color, alpha=0.45, label=away_name)
         ax.plot(centers, net, color=home_color if (_np.nanmean(net) if hasattr(_np, 'nanmean') else 0) >= 0 else away_color, linewidth=1.4, alpha=0.9)
 
-        ax.axvline(45, color='#9aa6b2', linestyle='-', linewidth=1.0, alpha=0.6)
+        ax.axvline(45, color=grid_color, linestyle='-', linewidth=1.0, alpha=0.6)
         ax.text(45, 95, 'HT', ha='center', va='center', fontsize=8,
                 color=self.get_text_color())
 
@@ -169,9 +172,10 @@ class AdvancedVisualizations(BaseVisualization):
         pitch = self.create_pitch()
         pitch.draw(ax=ax)
 
-        # Define zones
+        # Define zones - use team color for zone 14 for consistency
+        zone14_color = team_color if team_color else self.theme.get_color('interactive')
         zone14_rect = patches.Rectangle((70, 20.4), 17.5, 27.2, linewidth=2,
-                                       edgecolor='#bd841c', facecolor='#bd841c', alpha=0.2, zorder=2)
+                                       edgecolor=zone14_color, facecolor=zone14_color, alpha=0.3, zorder=2)
         left_hs_rect = patches.Rectangle((70, 10.2), 17.5, 17, linewidth=2,
                                         edgecolor=team_color, facecolor=team_color, alpha=0.15, zorder=2)
         right_hs_rect = patches.Rectangle((70, 40.8), 17.5, 17, linewidth=2,

@@ -79,6 +79,17 @@ st.markdown("""
         color: #000000;
     }
 
+    [data-testid="stSidebar"] h2,
+    [data-testid="stSidebar"] h3 {
+        color: #000000;
+    }
+
+    [data-testid="stSidebar"] p,
+    [data-testid="stSidebar"] label,
+    [data-testid="stSidebar"] div {
+        color: #333333;
+    }
+
     /* Buttons */
     .stButton>button {
         width: 100%;
@@ -189,9 +200,9 @@ st.markdown("""
 
 
 @st.cache_data(ttl=3600)
-def load_match_data(whoscored_id: int, fotmob_id: int = None, use_cache: bool = True):
+def load_match_data(whoscored_id: int, fotmob_id: int = None, use_cache: bool = True, theme: str = 'dark'):
     """Load and process match data with caching."""
-    generator = ReportGenerator(cache_dir="./cache", theme='dark')
+    generator = ReportGenerator(cache_dir="./cache", theme=theme)
     whoscored_data, fotmob_data = generator.data_loader.load_all_data(
         whoscored_id, fotmob_id, use_cache=use_cache
     )
@@ -543,12 +554,12 @@ def main():
     with st.sidebar:
         st.markdown("<div style='text-align: center; padding: 1rem;'>", unsafe_allow_html=True)
         st.image("https://img.icons8.com/color/96/000000/soccer-ball.png", width=80)
-        st.markdown("<h2 style='color: white; text-align: center;'>Match Configuration</h2>", unsafe_allow_html=True)
+        st.markdown("<h2 style='color: #000000; text-align: center;'>Match Configuration</h2>", unsafe_allow_html=True)
         st.markdown("</div>", unsafe_allow_html=True)
         st.markdown("---")
 
         # Match IDs
-        st.markdown("<h3 style='color: #e2e8f0;'>Match IDs</h3>", unsafe_allow_html=True)
+        st.markdown("<h3 style='color: #000000;'>Match IDs</h3>", unsafe_allow_html=True)
 
         whoscored_id = st.number_input(
             "WhoScored Match ID",
@@ -692,7 +703,7 @@ def main():
                 try:
                     fotmob_id_value = fotmob_id if fotmob_id > 0 else None
                     whoscored_data, fotmob_data, processor, match_summary = load_match_data(
-                        whoscored_id, fotmob_id_value, use_cache
+                        whoscored_id, fotmob_id_value, use_cache, theme
                     )
 
                     # Store in session state

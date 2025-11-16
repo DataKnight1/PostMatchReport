@@ -150,23 +150,26 @@ class StatisticalVisualizations(BaseVisualization):
         away_xg = float(match_info.get('xg', {}).get('away_xg', 0.0))
         tot_xg = max(home_xg + away_xg, 0.0001)
 
+        # Get bar background color from theme
+        bar_bg_color = self.theme.get_color('surface') if self.is_dark_theme() else '#e0e0e0'
+
         # Possession bar
         ax.text(0.1, 0.80, 'Possession', color=text_color, fontsize=10, transform=ax.transAxes)
         ax.add_patch(patches.Rectangle((0.1, 0.76), 0.8, 0.04, transform=ax.transAxes,
-                                       facecolor='#38404a', edgecolor='none', zorder=0))
+                                       facecolor=bar_bg_color, edgecolor='none', zorder=0))
         ax.add_patch(patches.Rectangle((0.1, 0.76), 0.8 * (home_pos/100.0), 0.04, transform=ax.transAxes,
                                        facecolor=home_color, alpha=0.6, edgecolor='none', zorder=1))
-        ax.text(0.1, 0.755, f"{home_pos:.0f}%", color=home_color, fontsize=9, transform=ax.transAxes)
-        ax.text(0.9, 0.755, f"{away_pos:.0f}%", color=away_color, fontsize=9, ha='right', transform=ax.transAxes)
+        ax.text(0.1, 0.755, f"{home_pos:.0f}%", color=text_color, fontsize=9, fontweight='bold', transform=ax.transAxes)
+        ax.text(0.9, 0.755, f"{away_pos:.0f}%", color=text_color, fontsize=9, fontweight='bold', ha='right', transform=ax.transAxes)
 
         # xG bar
         ax.text(0.1, 0.71, 'xG', color=text_color, fontsize=10, transform=ax.transAxes)
         ax.add_patch(patches.Rectangle((0.1, 0.67), 0.8, 0.04, transform=ax.transAxes,
-                                       facecolor='#38404a', edgecolor='none', zorder=0))
+                                       facecolor=bar_bg_color, edgecolor='none', zorder=0))
         ax.add_patch(patches.Rectangle((0.1, 0.67), 0.8 * (home_xg/tot_xg), 0.04, transform=ax.transAxes,
                                        facecolor=home_color, alpha=0.6, edgecolor='none', zorder=1))
-        ax.text(0.1, 0.665, f"{home_xg:.2f}", color=home_color, fontsize=9, transform=ax.transAxes)
-        ax.text(0.9, 0.665, f"{away_xg:.2f}", color=away_color, fontsize=9, ha='right', transform=ax.transAxes)
+        ax.text(0.1, 0.665, f"{home_xg:.2f}", color=text_color, fontsize=9, fontweight='bold', transform=ax.transAxes)
+        ax.text(0.9, 0.665, f"{away_xg:.2f}", color=text_color, fontsize=9, fontweight='bold', ha='right', transform=ax.transAxes)
 
         # Column headers with team logos above the table
         logos = match_info.get('team_logos', {}) if isinstance(match_info, dict) else {}
@@ -192,12 +195,12 @@ class StatisticalVisualizations(BaseVisualization):
         draw_small_badge(x_away, header_y, logos.get('away'), initials_from(away_name), away_col)
         ax.text(x_stat, header_y, 'Team Stats', ha='center', va='center', fontsize=10, color=text_color, transform=ax.transAxes)
 
-        # Draw zebra row backgrounds and aligned text
-        bg_dark = '#2f363f'
-        bg_light = '#e9ecef'
+        # Draw zebra row backgrounds and aligned text using theme colors
         is_dark = self.is_dark_theme()
-        row_bg = bg_dark if is_dark else bg_light
-        alt_row_bg = (0.85, 0.85, 0.85, 0.35) if not is_dark else (0.22, 0.25, 0.30, 0.5)
+        # Use theme surface color for main row background
+        row_bg = self.theme.get_color('surface')
+        # Slightly lighter/darker for alternate rows
+        alt_row_bg = self.theme.get_color('background') if is_dark else '#f5f5f5'
 
         def _fmt(v):
             s = str(v)
@@ -214,14 +217,14 @@ class StatisticalVisualizations(BaseVisualization):
                                            transform=ax.transAxes, facecolor=rect_color,
                                            edgecolor='none', zorder=0))
 
-            # Text values
+            # Text values - use text_color for better visibility on all backgrounds
             ax.text(x_stat, stats_y, stat_name, ha='center', va='center', fontsize=10,
                     fontweight='bold', color=text_color, zorder=1, transform=ax.transAxes)
-            # Right align home, left align away
+            # Right align home, left align away - use text color for visibility
             ax.text(x_home-0.02, stats_y, _fmt(home_val), ha='right', va='center', fontsize=10,
-                    color=home_color, fontweight='bold', zorder=1, transform=ax.transAxes)
+                    color=text_color, fontweight='bold', zorder=1, transform=ax.transAxes)
             ax.text(x_away+0.02, stats_y, _fmt(away_val), ha='left', va='center', fontsize=10,
-                    color=away_color, fontweight='bold', zorder=1, transform=ax.transAxes)
+                    color=text_color, fontweight='bold', zorder=1, transform=ax.transAxes)
             stats_y -= line_height
 
     def create_stats_comparison_bars(self, ax, team_stats, stat_name, home_color, away_color):

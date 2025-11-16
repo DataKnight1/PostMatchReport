@@ -123,8 +123,8 @@ class HeatmapVisualizations(BaseVisualization):
             leg = ax.legend(handles=[home_patch, away_patch, neutral_patch],
                             loc='lower center', bbox_to_anchor=(0.5, -0.08), ncol=3,
                             fontsize=8, framealpha=0.9)
-            # Make legend text visible on all backgrounds
-            legend_text_color = '#e6edf3' if self.line_color == '#d0d7de' else 'black'
+            # Make legend text visible on all backgrounds using theme color
+            legend_text_color = self.get_text_color()
             plt.setp(leg.get_texts(), color=legend_text_color)
         except Exception:
             pass

@@ -60,7 +60,7 @@ class TacticalVisualizer(BaseVisualization):
         zone_width = pitch_width / grid_rows
 
         # Define colors (use theme-appropriate color for contested zones)
-        contested_color = '#d0d0d0' if not self.is_dark_theme() else '#4a5568'
+        contested_color = self.theme.get_color('border')
 
         # Draw zone fills first (background layer)
         for row in range(grid_rows):
