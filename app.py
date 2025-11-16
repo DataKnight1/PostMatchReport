@@ -29,60 +29,61 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Custom CSS - Black & White Minimalist Design
+# Custom CSS - Dark Mode Design
 st.markdown("""
     <style>
-    /* Global Styles */
+    /* Global Styles - Dark Mode */
     .main {
-        background-color: #ffffff;
+        background-color: #22272e;
         font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        color: #e6edf3;
     }
 
     /* Typography */
     h1 {
-        color: #000000;
+        color: #e6edf3;
         font-weight: 700;
         letter-spacing: -0.02em;
         margin-bottom: 0.5em;
     }
 
     h2 {
-        color: #000000;
+        color: #e6edf3;
         font-weight: 600;
         letter-spacing: -0.01em;
         margin-top: 2em;
         margin-bottom: 0.5em;
-        border-bottom: 1px solid #e0e0e0;
+        border-bottom: 1px solid #444c56;
         padding-bottom: 0.3em;
     }
 
     h3 {
-        color: #333333;
+        color: #9aa6b2;
         font-weight: 600;
         margin-top: 1.5em;
     }
 
     p {
-        color: #666666;
+        color: #9aa6b2;
         line-height: 1.6;
     }
 
-    /* Sidebar */
+    /* Sidebar - Dark */
     [data-testid="stSidebar"] {
-        background-color: #fafafa;
-        border-right: 1px solid #e0e0e0;
+        background-color: #2b313a;
+        border-right: 1px solid #444c56;
     }
 
     [data-testid="stSidebar"] h1 {
         font-size: 1.5rem;
         margin-bottom: 2rem;
-        color: #000000;
+        color: #e6edf3;
     }
 
-    /* Buttons */
+    /* Buttons - Light on Dark */
     .stButton>button {
         width: 100%;
-        background-color: #000000;
+        background-color: #539bf5;
         color: #ffffff;
         border: none;
         padding: 0.75rem 1.5rem;
@@ -93,51 +94,52 @@ st.markdown("""
     }
 
     .stButton>button:hover {
-        background-color: #333333;
+        background-color: #6cb6ff;
         transform: translateY(-1px);
-        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        box-shadow: 0 4px 8px rgba(83, 155, 245, 0.3);
     }
 
-    /* Inputs */
+    /* Inputs - Dark with Light Text */
     .stNumberInput input,
     .stTextInput input,
     .stSelectbox select {
-        border: 1px solid #e0e0e0;
+        border: 1px solid #444c56;
         border-radius: 4px;
         padding: 0.5rem;
-        background-color: #ffffff;
+        background-color: #2b313a;
+        color: #e6edf3;
     }
 
     .stNumberInput input:focus,
     .stTextInput input:focus,
     .stSelectbox select:focus {
-        border-color: #000000;
-        box-shadow: 0 0 0 1px #000000;
+        border-color: #539bf5;
+        box-shadow: 0 0 0 1px #539bf5;
         outline: none;
     }
 
     /* Checkbox */
     .stCheckbox {
-        color: #333333;
+        color: #9aa6b2;
     }
 
-    /* Cards/Panels */
+    /* Cards/Panels - Dark */
     .match-info {
-        background-color: #fafafa;
-        border: 1px solid #e0e0e0;
+        background-color: #2b313a;
+        border: 1px solid #444c56;
         padding: 2rem;
         margin: 2rem 0;
         border-radius: 4px;
     }
 
-    /* Metrics */
+    /* Metrics - Light Text */
     [data-testid="stMetricValue"] {
-        color: #000000;
+        color: #e6edf3;
         font-weight: 700;
     }
 
     [data-testid="stMetricLabel"] {
-        color: #666666;
+        color: #9aa6b2;
         font-weight: 500;
         text-transform: uppercase;
         font-size: 0.75rem;
@@ -147,41 +149,41 @@ st.markdown("""
     /* Dividers */
     hr {
         border: none;
-        border-top: 1px solid #e0e0e0;
+        border-top: 1px solid #444c56;
         margin: 2rem 0;
     }
 
-    /* Expanders */
+    /* Expanders - Dark */
     .streamlit-expanderHeader {
-        background-color: #fafafa;
-        border: 1px solid #e0e0e0;
-        color: #000000;
+        background-color: #2b313a;
+        border: 1px solid #444c56;
+        color: #e6edf3;
         font-weight: 600;
         border-radius: 4px;
     }
 
     .streamlit-expanderHeader:hover {
-        background-color: #f5f5f5;
+        background-color: #373e47;
     }
 
-    /* Info boxes */
+    /* Info boxes - Dark */
     .stAlert {
-        background-color: #fafafa;
-        border: 1px solid #e0e0e0;
-        color: #333333;
+        background-color: #2b313a;
+        border: 1px solid #444c56;
+        color: #9aa6b2;
         border-radius: 4px;
     }
 
-    /* Download button */
+    /* Download button - Outlined */
     .stDownloadButton>button {
-        background-color: #ffffff;
-        color: #000000;
-        border: 1px solid #000000;
+        background-color: #2b313a;
+        color: #e6edf3;
+        border: 1px solid #539bf5;
         font-weight: 600;
     }
 
     .stDownloadButton>button:hover {
-        background-color: #000000;
+        background-color: #539bf5;
         color: #ffffff;
     }
     </style>
@@ -537,18 +539,18 @@ def main():
 
     # Header
     st.markdown("<h1>⚽ PostMatchReport</h1>", unsafe_allow_html=True)
-    st.markdown("<p style='text-align: center; font-size: 1.2rem; color: #718096; margin-bottom: 2rem;'>Professional Football Analytics Platform</p>", unsafe_allow_html=True)
+    st.markdown("<p style='text-align: center; font-size: 1.2rem; color: #9aa6b2; margin-bottom: 2rem;'>Professional Football Analytics Platform</p>", unsafe_allow_html=True)
 
     # Sidebar
     with st.sidebar:
         st.markdown("<div style='text-align: center; padding: 1rem;'>", unsafe_allow_html=True)
         st.image("https://img.icons8.com/color/96/000000/soccer-ball.png", width=80)
-        st.markdown("<h2 style='color: white; text-align: center;'>Match Configuration</h2>", unsafe_allow_html=True)
+        st.markdown("<h2 style='color: #e6edf3; text-align: center;'>Match Configuration</h2>", unsafe_allow_html=True)
         st.markdown("</div>", unsafe_allow_html=True)
         st.markdown("---")
 
         # Match IDs
-        st.markdown("<h3 style='color: #e2e8f0;'>Match IDs</h3>", unsafe_allow_html=True)
+        st.markdown("<h3 style='color: #9aa6b2;'>Match IDs</h3>", unsafe_allow_html=True)
 
         whoscored_id = st.number_input(
             "WhoScored Match ID",
@@ -630,13 +632,13 @@ def main():
         st.markdown("""
         <div class="component-card">
             <h2>Welcome to PostMatchReport!</h2>
-            <p style='font-size: 1.2rem; color: #4a5568; line-height: 1.8;'>
+            <p style='font-size: 1.2rem; color: #9aa6b2; line-height: 1.8;'>
                 Generate comprehensive football match reports with 12 professional visualizations.
                 View each component separately or generate a complete combined report.
             </p>
             <br>
             <h3>Features</h3>
-            <ul style='font-size: 1.1rem; color: #4a5568; line-height: 2;'>
+            <ul style='font-size: 1.1rem; color: #9aa6b2; line-height: 2;'>
                 <li><strong>Individual Component View</strong> - Explore each visualization separately</li>
                 <li><strong>Complete Report Generation</strong> - professional 4x3 grid layout</li>
                 <li><strong>Dark & Light Themes</strong> - Choose your preferred style</li>
@@ -644,7 +646,7 @@ def main():
                 <li><strong>Smart Caching</strong> - Fast reloading of previous matches</li>
             </ul>
             <br>
-            <p style='font-size: 1.1rem; color: #667eea; font-weight: 600;'>
+            <p style='font-size: 1.1rem; color: #539bf5; font-weight: 600;'>
                 Enter Match IDs in the sidebar and click "Load Match Data" to begin
             </p>
         </div>
@@ -787,7 +789,7 @@ def main():
 
         with tab1:
             st.markdown("<h2>View Individual Visualizations</h2>", unsafe_allow_html=True)
-            st.markdown("<p style='font-size: 1.1rem; color: #718096;'>Explore each analysis component separately with full detail</p>", unsafe_allow_html=True)
+            st.markdown("<p style='font-size: 1.1rem; color: #9aa6b2;'>Explore each analysis component separately with full detail</p>", unsafe_allow_html=True)
 
             # Component categories
             st.markdown("<h3 style='margin-top: 2rem;'>Overview & Statistics</h3>", unsafe_allow_html=True)
@@ -892,7 +894,7 @@ def main():
 
         with tab2:
             st.markdown("<h2>Complete Match Report</h2>", unsafe_allow_html=True)
-            st.markdown("<p style='font-size: 1.1rem; color: #718096;'>All 12 visualizations in a professional 4x3 grid layout</p>", unsafe_allow_html=True)
+            st.markdown("<p style='font-size: 1.1rem; color: #9aa6b2;'>All 12 visualizations in a professional 4x3 grid layout</p>", unsafe_allow_html=True)
 
             generate_report_btn = st.button("Generate Complete Report", type="primary", use_container_width=True)
 
@@ -929,7 +931,7 @@ def main():
                 st.markdown("""
                 <div class="download-section">
                     <h3>Your report is ready!</h3>
-                    <p style='font-size: 1.1rem; color: #4a5568;'>Download the complete match report in high quality</p>
+                    <p style='font-size: 1.1rem; color: #9aa6b2;'>Download the complete match report in high quality</p>
                 </div>
                 """, unsafe_allow_html=True)
 
@@ -1029,8 +1031,8 @@ def main():
     st.markdown("---")
     st.markdown("""
     <div class="footer">
-        <p style='font-size: 1.1rem; font-weight: 600;'>PostMatchReport - Professional Football Analytics</p>
-        <p style='font-size: 0.9rem;'>Data from WhoScored & FotMob • Built with Python & Streamlit</p>
+        <p style='font-size: 1.1rem; font-weight: 600; color: #9aa6b2;'>PostMatchReport - Professional Football Analytics</p>
+        <p style='font-size: 0.9rem; color: #6e7681;'>Data from WhoScored & FotMob • Built with Python & Streamlit</p>
     </div>
     """, unsafe_allow_html=True)
 
