@@ -4,7 +4,7 @@
 extraction:
   # Browser settings for Playwright
   browser:
-    type: firefox  # Options: firefox, chromium, webkit
+    type: chromium  # Options: firefox, chromium, webkit
     headless: true
     timeout: 60000  # milliseconds
 

@@ -25,7 +25,7 @@ class DataLoader:
         self.cache_dir = cache_dir
         os.makedirs(cache_dir, exist_ok=True)
 
-        self.whoscored_extractor = WhoScoredExtractor(headless=True)
+        self.whoscored_extractor = WhoScoredExtractor(headless=True, browser_type="chromium")
         self.fotmob_extractor = FotMobExtractor()
 
     def load_whoscored_data(self, match_id: int, use_cache: bool = True) -> Dict[str, Any]:

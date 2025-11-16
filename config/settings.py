@@ -21,7 +21,7 @@ CACHE_DIR = './cache'
 USE_CACHE_BY_DEFAULT = True
 
 # Browser settings
-BROWSER_TYPE = 'firefox'  # 'firefox', 'chromium', or 'webkit'
+BROWSER_TYPE = 'chromium'  # 'firefox', 'chromium', or 'webkit'
 HEADLESS = True
 
 # Data extraction

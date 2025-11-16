@@ -231,7 +231,7 @@ The `StatsAggregator` produces statistics matching the WhoScored match summary i
 pip install playwright pandas numpy beautifulsoup4 requests lxml
 
 # Install Playwright browsers
-python -m playwright install firefox
+python -m playwright install chromium
 
 # Database support (optional)
 pip install sqlalchemy psycopg2-binary  # For PostgreSQL
@@ -246,7 +246,7 @@ pip install openpyxl  # For Excel
 
 ```bash
 pip install -r requirements.txt
-python -m playwright install firefox
+python -m playwright install chromium
 ```
 
 ## Usage Examples
