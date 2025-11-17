@@ -146,12 +146,12 @@ st.markdown("""
 
     /* Metrics - Light Text */
     [data-testid="stMetricValue"] {
-        color: #e6edf3;
+        color: #ffffff;
         font-weight: 700;
     }
 
     [data-testid="stMetricLabel"] {
-        color: #9aa6b2;
+        color: #ffffff;
         font-weight: 500;
         text-transform: uppercase;
         font-size: 0.75rem;
@@ -182,7 +182,7 @@ st.markdown("""
     .stAlert {
         background-color: #2b313a;
         border: 1px solid #444c56;
-        color: #9aa6b2;
+        color: #ffffff;
         border-radius: 4px;
     }
 
@@ -556,7 +556,7 @@ def main():
     # Sidebar
     with st.sidebar:
         st.markdown("<div style='text-align: center; padding: 1rem;'>", unsafe_allow_html=True)
-        st.image("https://img.icons8.com/color/96/000000/soccer-ball.png", width=80)
+        st.markdown("<h1 style='font-size: 3.5rem; margin: 0;'>⚽</h1>", unsafe_allow_html=True)
         st.markdown("<h2 style='color: #e6edf3; text-align: center;'>Match Configuration</h2>", unsafe_allow_html=True)
         st.markdown("</div>", unsafe_allow_html=True)
         st.markdown("---")
